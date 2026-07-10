@@ -1,9 +1,10 @@
 import { api } from "@/lib/api/client";
-import { roundName } from "@/lib/format";
+import { roundName, roundTag } from "@/lib/format";
 import type {
   Bracket,
   BracketTie,
   Fixture,
+  FixtureDetail,
   Group,
   GroupDetail,
   OverviewData,
@@ -77,12 +78,33 @@ async function bracketFromDetail(detail: TournamentDetail, teams: TeamMap): Prom
 
   const bracket = await api.bracket(stage.id);
 
+  // Knockout fixtures carry the played score and the writable handle (id + version).
+  const fixtureByTie = new Map<number, FixtureDetail>();
+  for (const fixture of stage.fixtures) {
+    if (fixture.tieId !== null) fixtureByTie.set(fixture.tieId, fixture);
+  }
+
   const ties: BracketTie[] = bracket.ties
-    .map((tie) => ({
-      ...tie,
-      home: { ...tie.home, team: enrich(teams, tie.home.team) },
-      away: { ...tie.away, team: enrich(teams, tie.away.team) },
-    }))
+    .map((tie) => {
+      const fixture = fixtureByTie.get(tie.id);
+      return {
+        ...tie,
+        home: {
+          ...tie.home,
+          team: enrich(teams, tie.home.team),
+          score: fixture?.homeScore ?? null,
+          penalties: fixture?.homePenalties ?? null,
+        },
+        away: {
+          ...tie.away,
+          team: enrich(teams, tie.away.team),
+          score: fixture?.awayScore ?? null,
+          penalties: fixture?.awayPenalties ?? null,
+        },
+        fixtureId: fixture?.id,
+        version: fixture?.version,
+      };
+    })
     .sort((a, b) => a.round - b.round || a.id - b.id);
 
   const slotByRound = new Map<number, number>();
@@ -90,6 +112,18 @@ async function bracketFromDetail(detail: TournamentDetail, teams: TeamMap): Prom
     const slot = (slotByRound.get(tie.round) ?? 0) + 1;
     slotByRound.set(tie.round, slot);
     tie.slot = slot;
+  }
+
+  // Undecided sides read "Winner QF1" etc., derived from the feeding round + slot.
+  const maxRound = Math.max(...ties.map((tie) => tie.round), 1);
+  for (const tie of ties) {
+    if (tie.round === 1) continue;
+    if (!tie.home.team) {
+      tie.home.placeholder ??= `Winner ${roundTag(tie.round - 1, maxRound, tie.slot * 2 - 1)}`;
+    }
+    if (!tie.away.team) {
+      tie.away.placeholder ??= `Winner ${roundTag(tie.round - 1, maxRound, tie.slot * 2)}`;
+    }
   }
 
   return { stageId: bracket.stageId, champion: enrich(teams, bracket.champion), ties };

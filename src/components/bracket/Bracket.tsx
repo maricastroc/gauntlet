@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Bracket as BracketData, BracketTie } from "@/lib/types";
 import { roundName } from "@/lib/format";
 import { MatchCard } from "./MatchCard";
@@ -25,20 +26,20 @@ function RoundColumn({
   matches,
   round,
   maxRound,
+  renderCard,
 }: {
   matches: BracketTie[];
   round: number;
   maxRound: number;
+  renderCard: (tie: BracketTie) => ReactNode;
 }) {
   return (
     <div className="flex w-[212px] shrink-0 flex-col">
       <RoundHeader>{roundName(round, maxRound)}</RoundHeader>
       <div className="flex flex-1 flex-col">
         {matches.map((tie) => (
-          <div key={tie.id} className="flex flex-1 items-center">
-            <div className="w-full">
-              <MatchCard tie={tie} />
-            </div>
+          <div key={tie.id} className="flex flex-1 items-center py-2">
+            <div className="w-full">{renderCard(tie)}</div>
           </div>
         ))}
       </div>
@@ -46,9 +47,16 @@ function RoundColumn({
   );
 }
 
-export function Bracket({ data }: { data: BracketData }) {
+interface BracketProps {
+  data: BracketData;
+  renderCard?: (tie: BracketTie) => ReactNode;
+  championSlot?: ReactNode;
+}
+
+export function Bracket({ data, renderCard, championSlot }: BracketProps) {
   const rounds = groupByRound(data.ties);
   const maxRound = rounds.length;
+  const card = renderCard ?? ((tie: BracketTie) => <MatchCard tie={tie} />);
 
   return (
     <div className="overflow-x-auto px-5 pb-8 pt-6 sm:px-6">
@@ -59,7 +67,7 @@ export function Bracket({ data }: { data: BracketData }) {
           const nextCount = rounds[index + 1]?.length ?? 0;
           return (
             <div key={round} className="flex items-stretch">
-              <RoundColumn matches={matches} round={round} maxRound={maxRound} />
+              <RoundColumn matches={matches} round={round} maxRound={maxRound} renderCard={card} />
               {!isLast && <PairConnector pairs={nextCount} />}
             </div>
           );
@@ -70,7 +78,7 @@ export function Bracket({ data }: { data: BracketData }) {
           <div className={HEADER_SPACER} aria-hidden="true" />
           <div className="flex flex-1 items-center">
             <div className="w-full">
-              <ChampionCard champion={data.champion} />
+              {championSlot ?? <ChampionCard champion={data.champion} />}
             </div>
           </div>
         </div>

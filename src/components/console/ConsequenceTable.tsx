@@ -20,7 +20,7 @@ export function ConsequenceTable({
   const baseById = new Map(base.map((row) => [row.team.id, row]));
 
   return (
-    <div className="min-w-0 bg-linear-to-b from-amber/3 to-transparent px-5 pb-6 sm:px-6">
+    <div className="min-w-0 px-5 pt-2 pb-6 sm:px-6">
       <p className="mb-1 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-amber">
         ◆ Consequence · Group {groupName}
       </p>

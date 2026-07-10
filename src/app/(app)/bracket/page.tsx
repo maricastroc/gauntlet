@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PageHeading } from "@/components/ui/PageHeading";
-import { Bracket } from "@/components/bracket/Bracket";
+import { PlayableBracket } from "@/components/bracket/PlayableBracket";
 import { BracketLegend } from "@/components/bracket/BracketLegend";
 import { getBracket } from "@/lib/data";
 import { getCurrentTournamentId } from "@/lib/tournament/current";
@@ -22,7 +22,7 @@ export default async function BracketPage() {
       <PageHeading
         eyebrow="Knockout"
         title="Bracket"
-        subtitle="Every winner advances through the bracket — the path to the trophy, updated with each result."
+        subtitle="Tap any tie to enter the score — the winner advances through the bracket, all the way to the trophy."
         actions={bracket.ties.length > 0 ? <BracketLegend /> : undefined}
       />
 
@@ -45,7 +45,7 @@ export default async function BracketPage() {
       )}
 
       {bracket.ties.length > 0 ? (
-        <Bracket data={bracket} />
+        <PlayableBracket initial={bracket} />
       ) : (
         <div className="px-5 pt-3 sm:px-6">
           <div className="rounded-[11px] border border-dashed border-line-2 px-6 py-12 text-center text-[14px] text-ink-mute">

@@ -1,6 +1,3 @@
-// Applies the scalar tiebreak chain; the API's authority is a recursive
-// head-to-head mini-league. This scalar copy is sufficient for the demo data.
-
 import type { ResultLetter, StandingRow, Team } from "@/lib/types";
 
 export interface RawMatch {

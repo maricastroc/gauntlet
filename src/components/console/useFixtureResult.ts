@@ -20,8 +20,6 @@ export function useFixtureResult(fixture: FixtureDetail, group: GroupDetail) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // A scheduled match is always saveable (its first result); a finished one
-  // only when the score actually changes.
   const changed = home !== (fixture.homeScore ?? 0) || away !== (fixture.awayScore ?? 0);
   const dirty = fixture.status !== "finished" || changed;
 

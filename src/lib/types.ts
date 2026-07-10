@@ -60,6 +60,9 @@ export interface BracketTie {
   decidedByPenalties: boolean;
   kickoff?: string;
   liveMinute?: number;
+  // the knockout match backing this tie — the writable handle for saving a result
+  fixtureId?: number;
+  version?: number;
 }
 
 export interface Bracket {

@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         await api.logout(current);
       } catch {
-        // best-effort; the token is already cleared locally
+        //
       }
     }
   }, [token]);

@@ -359,6 +359,28 @@ export const api = {
     return data.map(toStandingRow);
   },
 
+  // Knockout results post to the same endpoint as group results — the API branches on
+  // the fixture's tie, records the score + penalties under an optimistic version lock,
+  // resolves the winner, advances them, and returns the re-resolved bracket.
+  submitKnockoutResult: async (
+    token: string,
+    fixtureId: number,
+    payload: {
+      home_score: number;
+      away_score: number;
+      home_penalties?: number | null;
+      away_penalties?: number | null;
+      expected_version: number;
+    },
+  ): Promise<Bracket> => {
+    const { data } = await request<Wrapped<ApiBracket>>(`/matches/${fixtureId}/result`, {
+      method: "PUT",
+      headers: authHeader(token),
+      body: JSON.stringify(payload),
+    });
+    return { stageId: 0, champion: toTeam(data.champion), ties: data.ties.map(toBracketTie) };
+  },
+
   listTournaments: async (token: string): Promise<TournamentSummary[]> => {
     const { data } = await request<Wrapped<ApiTournamentSummary[]>>("/tournaments", {
       headers: authHeader(token),

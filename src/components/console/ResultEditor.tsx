@@ -15,7 +15,7 @@ export function ResultEditor({ fixture, result }: ResultEditorProps) {
     result;
 
   return (
-    <div className="min-w-0 px-5 pb-6 sm:px-6 lg:border-r lg:border-line">
+    <div className="mt-4">
       <div className="mb-4 flex items-center justify-center gap-4 rounded-md border border-line bg-surface-2 p-5">
         <SideStepper team={fixture.home} value={home} onChange={setHome} />
         <span className="font-mono text-[14px] text-ink-mute">×</span>

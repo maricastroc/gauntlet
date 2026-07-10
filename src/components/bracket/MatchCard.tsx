@@ -83,20 +83,57 @@ function Tag({ tie }: { tie: BracketTie }) {
   return null;
 }
 
-export function MatchCard({ tie }: { tie: BracketTie }) {
+interface MatchCardProps {
+  tie: BracketTie;
+  interactive?: boolean;
+  selected?: boolean;
+  onSelect?: () => void;
+}
+
+export function MatchCard({
+  tie,
+  interactive = false,
+  selected = false,
+  onSelect,
+}: MatchCardProps) {
   const live = tie.status === "live";
-  return (
-    <div
-      className={[
-        "relative rounded-[11px] border bg-surface-2 p-1 transition-shadow duration-200",
-        live ? "border-loss/40 shadow-[0_0_0_1px_rgba(224,107,98,0.18)]" : "border-line",
-      ].join(" ")}
-    >
+  const playable = interactive && Boolean(tie.home.team && tie.away.team);
+  const awaiting = playable && tie.status !== "decided";
+
+  const shell = [
+    "relative block w-full rounded-[11px] border bg-surface-2 p-1 text-left transition-shadow duration-200",
+    selected
+      ? "border-amber-line shadow-[0_0_0_1px_rgba(242,169,59,0.5)]"
+      : live
+        ? "border-loss/40 shadow-[0_0_0_1px_rgba(224,107,98,0.18)]"
+        : "border-line",
+    playable && "hover:border-amber-line hover:shadow-[0_0_0_1px_rgba(242,169,59,0.28)]",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const inner = (
+    <>
       <Tag tie={tie} />
       <Side side={tie.home} tie={tie} />
       <div className="mt-0.5">
         <Side side={tie.away} tie={tie} />
       </div>
-    </div>
+      {awaiting && (
+        <span className="block px-2.5 pb-1 pt-0.5 font-mono text-[9.5px] uppercase tracking-[0.14em] text-amber">
+          enter result →
+        </span>
+      )}
+    </>
   );
+
+  if (playable) {
+    return (
+      <button type="button" onClick={onSelect} className={shell}>
+        {inner}
+      </button>
+    );
+  }
+
+  return <div className={shell}>{inner}</div>;
 }

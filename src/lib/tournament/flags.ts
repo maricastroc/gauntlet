@@ -14,9 +14,7 @@ function isoToFlag(iso2: string): string {
     .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)));
 }
 
-// [canonical display name, ISO 3166-1 alpha-2] — one row per country.
 const COUNTRY_TABLE: Array<[string, string]> = [
-  // South America
   ["Argentina", "AR"],
   ["Bolivia", "BO"],
   ["Brazil", "BR"],
@@ -27,7 +25,6 @@ const COUNTRY_TABLE: Array<[string, string]> = [
   ["Peru", "PE"],
   ["Uruguay", "UY"],
   ["Venezuela", "VE"],
-  // Europe
   ["Albania", "AL"],
   ["Andorra", "AD"],
   ["Austria", "AT"],
@@ -72,7 +69,6 @@ const COUNTRY_TABLE: Array<[string, string]> = [
   ["Turkey", "TR"],
   ["Ukraine", "UA"],
   ["United Kingdom", "GB"],
-  // North & Central America, Caribbean
   ["Canada", "CA"],
   ["Costa Rica", "CR"],
   ["Cuba", "CU"],
@@ -85,7 +81,6 @@ const COUNTRY_TABLE: Array<[string, string]> = [
   ["Panama", "PA"],
   ["Trinidad and Tobago", "TT"],
   ["United States", "US"],
-  // Africa
   ["Algeria", "DZ"],
   ["Angola", "AO"],
   ["Burkina Faso", "BF"],
@@ -110,7 +105,6 @@ const COUNTRY_TABLE: Array<[string, string]> = [
   ["Uganda", "UG"],
   ["Zambia", "ZM"],
   ["Zimbabwe", "ZW"],
-  // Asia
   ["Australia", "AU"],
   ["Bahrain", "BH"],
   ["China", "CN"],
@@ -136,11 +130,9 @@ const COUNTRY_TABLE: Array<[string, string]> = [
   ["United Arab Emirates", "AE"],
   ["Uzbekistan", "UZ"],
   ["Vietnam", "VN"],
-  // Oceania
   ["New Zealand", "NZ"],
 ];
 
-// Extra search aliases → ISO (already normalized keys).
 const ALIASES: Record<string, string> = {
   brasil: "BR",
   holland: "NL",
@@ -165,8 +157,6 @@ const ALIASES: Record<string, string> = {
   "democratic republic of the congo": "CD",
 };
 
-// England / Scotland / Wales are FIFA nations but not ISO countries — their
-// flags are subdivision emoji rather than regional-indicator pairs.
 const SPECIAL_FLAGS: Record<string, string> = {
   england: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
   scotland: "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
