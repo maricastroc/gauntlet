@@ -1,5 +1,6 @@
 import { computeStandings, type RawMatch } from "@/lib/standings";
 import { forecastGroup } from "@/lib/forecast/groups";
+import { titleOddsFrom } from "@/lib/forecast/bracket";
 import type {
   Bracket,
   BracketTie,
@@ -171,6 +172,7 @@ function demoOverview(): OverviewData {
       { value: "2.2", label: "Goals per match" },
       { value: String(groups.length * 2), label: "Teams through" },
     ],
+    titleOdds: titleOddsFrom(demoBracket(), groups),
   };
 }
 
@@ -179,6 +181,7 @@ const EMPTY_OVERVIEW: OverviewData = {
   liveFixture: null,
   nextFixture: null,
   stats: [],
+  titleOdds: [],
 };
 
 export function getOverview(id: number): Promise<OverviewData> {

@@ -1,11 +1,6 @@
-import type { TitleOdd } from "@/lib/forecast/bracket";
+import type { TitleOdd } from "@/lib/types";
+import { formatProbability } from "@/lib/format";
 import { Flag } from "@/components/ui/Flag";
-
-function formatPct(prob: number): string {
-  if (prob >= 0.995) return "100%";
-  if (prob > 0 && prob < 0.01) return "<1%";
-  return `${Math.round(prob * 100)}%`;
-}
 
 export function TitleOdds({ odds }: { odds: TitleOdd[] }) {
   if (odds.length <= 1) return null;
@@ -39,7 +34,7 @@ export function TitleOdds({ odds }: { odds: TitleOdd[] }) {
                 />
               </span>
               <span className="w-11 shrink-0 text-right font-mono text-[13px] tabular-nums text-amber-ink">
-                {formatPct(odd.prob)}
+                {formatProbability(odd.prob)}
               </span>
             </li>
           ))}

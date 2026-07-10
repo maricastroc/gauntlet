@@ -4,6 +4,7 @@ import { TiebreakNote } from "@/components/standings/TiebreakNote";
 import { LiveCard } from "@/components/overview/LiveCard";
 import { NextCard } from "@/components/overview/NextCard";
 import { StatTiles } from "@/components/overview/StatTiles";
+import { TitleRaceTeaser } from "@/components/overview/TitleRaceTeaser";
 import { getOverview } from "@/lib/data";
 import { getCurrentTournamentId } from "@/lib/tournament/current";
 
@@ -11,7 +12,8 @@ export const dynamic = "force-dynamic";
 
 export default async function OverviewPage() {
   const tournamentId = await getCurrentTournamentId();
-  const { featuredGroup, liveFixture, nextFixture, stats } = await getOverview(tournamentId);
+  const { featuredGroup, liveFixture, nextFixture, stats, titleOdds } =
+    await getOverview(tournamentId);
 
   return (
     <div className="pb-8">
@@ -44,7 +46,11 @@ export default async function OverviewPage() {
         <aside className="flex min-w-0 flex-col gap-4">
           {liveFixture && <LiveCard fixture={liveFixture} />}
           {nextFixture && <NextCard fixture={nextFixture} />}
-          <StatTiles stats={stats} />
+          {titleOdds.length > 1 ? (
+            <TitleRaceTeaser odds={titleOdds} />
+          ) : (
+            <StatTiles stats={stats} />
+          )}
         </aside>
       </div>
     </div>

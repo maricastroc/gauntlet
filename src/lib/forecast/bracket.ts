@@ -1,12 +1,7 @@
-import type { Bracket, BracketTie, Group, Team } from "@/lib/types";
+import type { Bracket, BracketTie, Group, Team, TitleOdd } from "@/lib/types";
 import { childOf } from "@/lib/knockout";
 import { hashString, mulberry32, type Rng } from "./rng";
 import { ratingsFromStandings, winProbability } from "./model";
-
-export interface TitleOdd {
-  team: Team;
-  prob: number;
-}
 
 const RUNS = 20000;
 

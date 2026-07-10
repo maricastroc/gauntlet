@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   formatGoalDifference,
+  formatProbability,
   initials,
   ordinal,
   relativeDate,
@@ -48,6 +49,23 @@ describe("formatGoalDifference", () => {
 
   it("renders zero without a sign", () => {
     expect(formatGoalDifference(0)).toBe("0");
+  });
+});
+
+describe("formatProbability", () => {
+  it("rounds to a whole percent", () => {
+    expect(formatProbability(0.26)).toBe("26%");
+    expect(formatProbability(0.555)).toBe("56%");
+  });
+
+  it("clamps the near-certain to 100% and the tiny-but-alive to <1%", () => {
+    expect(formatProbability(1)).toBe("100%");
+    expect(formatProbability(0.997)).toBe("100%");
+    expect(formatProbability(0.004)).toBe("<1%");
+  });
+
+  it("shows a bare 0% only for a true zero", () => {
+    expect(formatProbability(0)).toBe("0%");
   });
 });
 

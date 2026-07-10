@@ -29,6 +29,12 @@ export function roundTag(round: number, maxRound: number, slot: number): string 
   return distanceToFinal === 0 ? prefix : `${prefix}${slot}`;
 }
 
+export function formatProbability(prob: number): string {
+  if (prob >= 0.995) return "100%";
+  if (prob > 0 && prob < 0.01) return "<1%";
+  return `${Math.round(prob * 100)}%`;
+}
+
 export function formatGoalDifference(diff: number): string {
   if (diff > 0) return `+${diff}`;
   if (diff < 0) return `−${Math.abs(diff)}`;

@@ -1,5 +1,6 @@
 import { api } from "@/lib/api/client";
 import { roundName, roundTag } from "@/lib/format";
+import { titleOddsFrom } from "@/lib/forecast/bracket";
 import type {
   Bracket,
   BracketTie,
@@ -180,6 +181,7 @@ export async function liveOverview(id: number): Promise<OverviewData> {
     liveFixture: null,
     nextFixture: bracket.ties.length ? deriveNextFixture(bracket) : null,
     stats: computeStats(groups),
+    titleOdds: titleOddsFrom(bracket, groups),
   };
 }
 

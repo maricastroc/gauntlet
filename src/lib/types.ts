@@ -109,11 +109,17 @@ export interface OverviewStat {
   label: string;
 }
 
+export interface TitleOdd {
+  team: Team;
+  prob: number;
+}
+
 export interface OverviewData {
   featuredGroup: Group | null;
   liveFixture: Fixture | null;
   nextFixture: Fixture | null;
   stats: OverviewStat[];
+  titleOdds: TitleOdd[];
 }
 
 export interface TournamentSummary {
