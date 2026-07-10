@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type {
   Bracket,
   BracketTie,
@@ -388,10 +389,12 @@ export const api = {
     return data.map(toTournamentSummary);
   },
 
-  getTournament: async (id: number): Promise<TournamentDetail> => {
+  // Deduped per server render: the layout (meta) and page (view) both need the
+  // full tournament, and each render pass fetches it exactly once.
+  getTournament: cache(async (id: number): Promise<TournamentDetail> => {
     const { data } = await request<Wrapped<ApiTournamentDetail>>(`/tournaments/${id}`);
     return toTournamentDetail(data);
-  },
+  }),
 
   createTournament: async (token: string, name: string): Promise<TournamentSummary> => {
     const { data } = await request<Wrapped<ApiTournamentSummary>>("/tournaments", {
