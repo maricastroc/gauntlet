@@ -4,9 +4,10 @@ import { GroupCard } from "@/components/standings/GroupCard";
 import { getGroups } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Standings" };
+export const dynamic = "force-dynamic";
 
-export default function StandingsPage() {
-  const groups = getGroups();
+export default async function StandingsPage() {
+  const groups = await getGroups();
 
   return (
     <div className="pb-8">

@@ -1,10 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { ConsoleScenario } from "@/lib/data";
 import type { StandingRow } from "@/lib/types";
 import { computeStandings, type RawMatch } from "@/lib/standings";
 import { formatGoalDifference, ordinal } from "@/lib/format";
+import { api, ApiError } from "@/lib/api/client";
+import { useAuth } from "@/lib/auth/context";
 import { Flag } from "@/components/ui/Flag";
 import { Stepper } from "./Stepper";
 
@@ -65,9 +68,15 @@ export function ConsoleScreen({ scenario }: { scenario: ConsoleScenario }) {
     status: "finished",
   };
 
+  const { status, token } = useAuth();
+  const authed = status === "authed" && token !== null;
+
   const [draft, setDraft] = useState<Snapshot>(initial);
   const [committed, setCommitted] = useState<Snapshot>(initial);
-  const [justSaved, setJustSaved] = useState(false);
+  const [version, setVersion] = useState(scenario.version);
+  const [saving, setSaving] = useState(false);
+  const [savedVersion, setSavedVersion] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const baseStandings = useMemo(
     () => computeStandings(scenario.teams, projectMatches(scenario, committed), scenario.qualifyCount),
@@ -95,13 +104,33 @@ export function ConsoleScreen({ scenario }: { scenario: ConsoleScenario }) {
 
   const patch = (next: Partial<Snapshot>) => {
     setDraft((prev) => ({ ...prev, ...next }));
-    setJustSaved(false);
+    setSavedVersion(null);
+    setError(null);
   };
 
-  const confirm = () => {
-    setCommitted(draft);
-    setJustSaved(true);
+  /** Real, optimistic-locked write to the live API (owner-only). */
+  const confirm = async () => {
+    if (!authed || !token) return;
+    setSaving(true);
+    setError(null);
+    try {
+      await api.submitGroupResult(token, scenario.liveFixtureId, {
+        home_score: draft.home,
+        away_score: draft.away,
+        expected_version: version,
+      });
+      const nextVersion = version + 1;
+      setVersion(nextVersion);
+      setSavedVersion(nextVersion);
+      setCommitted(draft);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.displayMessage : "Could not reach the API.");
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const canSave = dirty && draft.status === "finished" && !saving;
 
   return (
     <div className="grid grid-cols-1 gap-y-8 lg:grid-cols-2 lg:gap-y-0">
@@ -152,24 +181,45 @@ export function ConsoleScreen({ scenario }: { scenario: ConsoleScenario }) {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={confirm}
-          disabled={!dirty}
-          className="flex w-full items-center justify-center gap-2 rounded-[11px] bg-amber px-4 py-3.5 text-[14px] font-bold text-[#1a1205] shadow-[0_8px_22px_-8px_rgba(242,169,59,0.6)] transition-all duration-150 enabled:hover:brightness-105 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
-        >
-          Confirm result
-        </button>
+        {authed ? (
+          <button
+            type="button"
+            onClick={confirm}
+            disabled={!canSave}
+            className="flex w-full items-center justify-center gap-2 rounded-[11px] bg-amber px-4 py-3.5 text-[14px] font-bold text-[#1a1205] shadow-[0_8px_22px_-8px_rgba(242,169,59,0.6)] transition-all duration-150 enabled:hover:brightness-105 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+          >
+            {saving ? "Saving…" : "Confirm result"}
+          </button>
+        ) : (
+          <Link
+            href="/login?from=/console"
+            className="flex w-full items-center justify-center gap-2 rounded-[11px] border border-amber-line bg-amber-soft px-4 py-3.5 text-[14px] font-bold text-amber-ink transition-colors duration-150 hover:brightness-110"
+          >
+            Sign in to save results
+          </Link>
+        )}
+
+        {error && (
+          <p
+            role="alert"
+            className="mt-3 rounded-[9px] border border-loss/35 bg-loss/[0.08] px-3 py-2 text-center text-[12px] text-loss"
+          >
+            {error}
+          </p>
+        )}
 
         <p className="mt-3 text-center font-mono text-[11.5px] tracking-[0.02em] text-ink-mute">
-          {justSaved ? (
-            <span className="text-win">✓ saved atomically · version {scenario.version + 1}</span>
+          {savedVersion !== null && !dirty ? (
+            <span className="text-win">✓ saved atomically · version {savedVersion}</span>
           ) : dirty ? (
             <>
               was {committed.home} – {committed.away} · changed to {draft.home} – {draft.away}
+              {authed && draft.status !== "finished" && " · set Full-time to save"}
             </>
-          ) : (
+          ) : authed ? (
             <>no pending changes</>
+          ) : (
+            <>reading only · sign in to edit</>
           )}
         </p>
 

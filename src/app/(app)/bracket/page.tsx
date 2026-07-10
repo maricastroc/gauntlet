@@ -4,10 +4,11 @@ import { Bracket } from "@/components/bracket/Bracket";
 import { BracketLegend } from "@/components/bracket/BracketLegend";
 import { getBracket } from "@/lib/data";
 
-export const metadata: Metadata = { title: "Chaveamento" };
+export const metadata: Metadata = { title: "Bracket" };
+export const dynamic = "force-dynamic";
 
-export default function BracketPage() {
-  const bracket = getBracket();
+export default async function BracketPage() {
+  const bracket = await getBracket();
 
   return (
     <div className="pb-4">

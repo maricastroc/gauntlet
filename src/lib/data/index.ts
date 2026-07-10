@@ -1,13 +1,14 @@
 /**
  * Data-access layer — the single seam the screens read from.
  *
- * Today it composes the Copa Atlas demo seed into UI-domain objects. To go
- * live, swap these functions for the `api` client (lib/api/client.ts); the
- * return shapes are identical, so no screen changes.
+ * Public reads (`getGroups`, `getGroup`, `getBracket`, `getOverview`) try the
+ * live API first and fall back to the demo fixtures if it's unreachable, so the
+ * app renders whether or not the API is running. Set `NEXT_PUBLIC_USE_LIVE_API=false`
+ * to force demo. Tournament chrome and the console scenario stay demo-fed — the
+ * API has no tournament-metadata or fixtures endpoint.
  */
 
 import { computeStandings } from "@/lib/standings";
-import { formatGoalDifference } from "@/lib/format";
 import type {
   Bracket,
   BracketTie,
@@ -27,6 +28,27 @@ import {
   type GroupSeed,
   type TieSeed,
 } from "./copa-atlas";
+import { buildTiebreakNote } from "./shared";
+import { liveBracket, liveGroup, liveGroups, liveOverview } from "./live";
+
+const LIVE_ENABLED = process.env.NEXT_PUBLIC_USE_LIVE_API !== "false";
+
+async function withFallback<T>(
+  live: () => Promise<T>,
+  demo: () => T,
+  label: string,
+): Promise<T> {
+  if (!LIVE_ENABLED) return demo();
+  try {
+    return await live();
+  } catch (error) {
+    console.warn(
+      `[data] live "${label}" failed, using demo fixtures:`,
+      error instanceof Error ? error.message : error,
+    );
+    return demo();
+  }
+}
 
 /* ------------------------------ tournament ------------------------------ */
 
@@ -47,38 +69,32 @@ export function getTournamentMeta(): TournamentMeta {
 
 /* -------------------------------- groups -------------------------------- */
 
-function assembleGroup(seed: GroupSeed): Group {
+function demoGroup(seed: GroupSeed): Group {
   const teams = seed.teamIds.map(team);
   const standings = computeStandings(teams, seed.matches, seed.qualifyCount);
-
-  const [first, second] = standings;
-  const tiebreakNote =
-    first && second && first.points === second.points
-      ? {
-          teams: [first.team.name, second.team.name],
-          points: first.points,
-          detail:
-            `${first.team.name} and ${second.team.name} both finished on ${first.points} pts. ` +
-            `${first.team.name} stays ahead on goal difference — ` +
-            `${formatGoalDifference(first.goalDifference)} × ${formatGoalDifference(second.goalDifference)}.`,
-        }
-      : undefined;
-
   return {
     id: seed.id,
     name: seed.name,
     qualifyCount: seed.qualifyCount,
     standings,
-    tiebreakNote,
+    tiebreakNote: buildTiebreakNote(standings),
   };
 }
 
-export function getGroups(): Group[] {
-  return GROUPS.map(assembleGroup);
+function demoGroups(): Group[] {
+  return GROUPS.map(demoGroup);
 }
 
-export function getGroup(id: number): Group {
-  return assembleGroup(groupSeed(id));
+export function getGroups(): Promise<Group[]> {
+  return withFallback(liveGroups, demoGroups, "groups");
+}
+
+export function getGroup(id: number): Promise<Group> {
+  return withFallback(
+    () => liveGroup(id),
+    () => demoGroup(groupSeed(id)),
+    `group ${id}`,
+  );
 }
 
 /* ------------------------------- bracket -------------------------------- */
@@ -113,17 +129,21 @@ function toBracketTie(seed: TieSeed): BracketTie {
   };
 }
 
-export function getBracket(): Bracket {
+function demoBracket(): Bracket {
   return {
     stageId: KNOCKOUT_STAGE_ID,
-    champion: null, // final not played
+    champion: null,
     ties: TIES.map(toBracketTie),
   };
 }
 
+export function getBracket(): Promise<Bracket> {
+  return withFallback(liveBracket, demoBracket, "bracket");
+}
+
 /* ------------------------------- overview ------------------------------- */
 
-function liveFixture(): Fixture | null {
+function demoLiveFixture(): Fixture | null {
   const seed = TIES.find((tie) => tie.status === "live");
   if (!seed || seed.homeId == null || seed.awayId == null) return null;
   return {
@@ -140,7 +160,7 @@ function liveFixture(): Fixture | null {
   };
 }
 
-function nextFixture(): Fixture | null {
+function demoNextFixture(): Fixture | null {
   const seed = TIES.find((tie) => tie.status === "ready" && tie.round === 1);
   if (!seed || seed.homeId == null || seed.awayId == null) return null;
   return {
@@ -157,6 +177,24 @@ function nextFixture(): Fixture | null {
   };
 }
 
+function demoOverview(): OverviewData {
+  const groups = demoGroups();
+  return {
+    featuredGroup: demoGroup(groupSeed(1)),
+    liveFixture: demoLiveFixture(),
+    nextFixture: demoNextFixture(),
+    stats: [
+      { value: "26", label: "Matches played" },
+      { value: "2.2", label: "Goals per match" },
+      { value: String(groups.length * 2), label: "Teams through" },
+    ],
+  };
+}
+
+export function getOverview(): Promise<OverviewData> {
+  return withFallback(liveOverview, demoOverview, "overview");
+}
+
 /* -------------------------------- console ------------------------------- */
 
 export interface ConsoleScenario {
@@ -165,19 +203,15 @@ export interface ConsoleScenario {
   qualifyCount: number;
   teams: import("@/lib/types").Team[];
   matches: import("@/lib/standings").RawMatch[];
-  /** Index into `matches` of the fixture the console edits. */
   editableIndex: number;
   home: import("@/lib/types").Team;
   away: import("@/lib/types").Team;
-  /** Optimistic-lock version echoed by the API on submit. */
+  /** The real fixture id for this match in the seeded API (Group A: Brazil × Croatia). */
+  liveFixtureId: number;
+  /** Optimistic-lock version to send first; 0 on a fresh seed. */
   version: number;
 }
 
-/**
- * The console edits one already-lodged group result and previews the
- * consequence. We pick Brasil × Croácia in Group A — the pair that, when
- * nudged, reorders the tiebreak at the top of the table.
- */
 export function getConsoleScenario(): ConsoleScenario {
   const seed = groupSeed(1);
   const teams = seed.teamIds.map(team);
@@ -195,20 +229,7 @@ export function getConsoleScenario(): ConsoleScenario {
     editableIndex,
     home: team(editable.homeId),
     away: team(editable.awayId),
-    version: 3,
-  };
-}
-
-export function getOverview(): OverviewData {
-  const groups = getGroups();
-  return {
-    featuredGroup: getGroup(1),
-    liveFixture: liveFixture(),
-    nextFixture: nextFixture(),
-    stats: [
-      { value: "26", label: "Matches played" },
-      { value: "2.2", label: "Goals per match" },
-      { value: String(groups.length * 2), label: "Teams in the finals" },
-    ],
+    liveFixtureId: 2,
+    version: 0,
   };
 }

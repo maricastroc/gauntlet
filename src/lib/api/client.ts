@@ -1,18 +1,15 @@
 /**
  * Live API client for tournament-game-api.
  *
- * The screens currently render from the demo data layer (`lib/data`), so this
- * client is the seam for going live: the raw response types below match the
- * Laravel resources exactly, and the mappers lift them into the UI domain.
- *
- * Endpoints (see the API README):
- *   POST /api/register · /api/login          → { user, token }
- *   GET  /api/groups/{group}/standings        → ApiStanding[]
- *   GET  /api/stages/{stage}/bracket          → ApiBracket
- *   PUT  /api/matches/{fixture}/result        → ApiStanding[] | ApiBracket
- *
  * Reads are public; the result mutation is owner-only (Sanctum bearer token),
  * uses optimistic locking via `expected_version`, and returns 409 on conflict.
+ *
+ * Wire notes learned from the running API:
+ *   - Resource responses are wrapped: `{ "data": ... }` (standings, bracket,
+ *     and the result mutation). Auth responses (`/login`, `/user`) are not.
+ *   - Team objects are `{ id, name }` with names in Portuguese; the data layer
+ *     enriches them to English + flags via a team catalog keyed by id.
+ *   - The bracket carries no per-side scores, kickoff or live state.
  */
 
 import type { Bracket, BracketTie, StandingRow, Team, TieStatus } from "@/lib/types";
@@ -59,6 +56,22 @@ interface ApiBracket {
   ties: ApiResolvedTie[];
 }
 
+/** Laravel wraps resource payloads in a top-level `data` key. */
+interface Wrapped<T> {
+  data: T;
+}
+
+export interface AuthUser {
+  id: number;
+  name: string;
+  email: string;
+}
+
+interface AuthResponse {
+  user: AuthUser;
+  token: string;
+}
+
 /* ------------------------------------------------------------------ */
 /* Errors                                                              */
 /* ------------------------------------------------------------------ */
@@ -77,28 +90,70 @@ export class ApiError extends Error {
   get isVersionConflict(): boolean {
     return this.status === 409;
   }
+
+  /** 401/403 — token missing/expired, or not the tournament owner. */
+  get isAuth(): boolean {
+    return this.status === 401 || this.status === 403;
+  }
+
+  /** 422 — validation. `fieldErrors` surfaces Laravel's messages. */
+  get fieldErrors(): Record<string, string[]> | undefined {
+    if (this.status !== 422 || typeof this.body !== "object" || this.body === null) {
+      return undefined;
+    }
+    return (this.body as { errors?: Record<string, string[]> }).errors;
+  }
+
+  /** A single human message, best-effort. */
+  get displayMessage(): string {
+    if (this.isVersionConflict) {
+      return "This result was changed elsewhere. Reload before editing again.";
+    }
+    if (this.status === 401) return "Your session has expired. Sign in again.";
+    if (this.status === 403) return "Only the tournament organizer can save results.";
+    const errors = this.fieldErrors;
+    if (errors) return Object.values(errors).flat()[0] ?? "Invalid data.";
+    if (typeof this.body === "object" && this.body !== null) {
+      const message = (this.body as { message?: string }).message;
+      if (message) return message;
+    }
+    return "Something went wrong. Try again.";
+  }
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
-  });
-
-  if (!res.ok) {
-    const body = await res.json().catch(() => undefined);
-    throw new ApiError(res.status, `${res.status} ${res.statusText}`, body);
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE_URL}${path}`, {
+      cache: "no-store",
+      ...init,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        ...init?.headers,
+      },
+    });
+  } catch (cause) {
+    // network failure / API not running
+    throw new ApiError(0, "Could not reach the API.", cause);
   }
 
-  return res.json() as Promise<T>;
+  if (res.status === 204) return undefined as T;
+
+  const body = await res.json().catch(() => undefined);
+  if (!res.ok) {
+    throw new ApiError(res.status, `${res.status} ${res.statusText}`, body);
+  }
+  return body as T;
+}
+
+function authHeader(token: string): Record<string, string> {
+  return { Authorization: `Bearer ${token}` };
 }
 
 /* ------------------------------------------------------------------ */
-/* Mappers: raw → UI domain                                            */
+/* Mappers: raw → UI domain (team names stay as the API sends them;    */
+/* the data layer enriches to English + flags)                          */
 /* ------------------------------------------------------------------ */
 
 function toTeam(team: ApiTeam | null): Team | null {
@@ -127,10 +182,8 @@ function toBracketTie(tie: ApiResolvedTie): BracketTie {
   return {
     id: tie.id,
     round: tie.round,
-    slot: 0,
+    slot: 0, // the resource has no slot; the data layer orders within a round
     status,
-    // The bracket resource does not carry per-side scores; the UI shows them
-    // when present, otherwise renders the "to be decided" treatment.
     home: { team: toTeam(tie.home), score: null },
     away: { team: toTeam(tie.away), score: null },
     winnerId: tie.winner?.id ?? null,
@@ -142,25 +195,33 @@ function toBracketTie(tie: ApiResolvedTie): BracketTie {
 /* Public surface                                                      */
 /* ------------------------------------------------------------------ */
 
-export interface AuthResult {
-  user: { id: number; name: string; email: string };
-  token: string;
-}
-
 export const api = {
+  /* --- auth --- */
   login: (email: string, password: string) =>
-    request<AuthResult>("/login", {
+    request<AuthResponse>("/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     }),
 
+  register: (name: string, email: string, password: string) =>
+    request<AuthResponse>("/register", {
+      method: "POST",
+      body: JSON.stringify({ name, email, password }),
+    }),
+
+  me: (token: string) => request<AuthUser>("/user", { headers: authHeader(token) }),
+
+  logout: (token: string) =>
+    request<void>("/logout", { method: "POST", headers: authHeader(token) }),
+
+  /* --- public reads --- */
   standings: async (groupId: number): Promise<StandingRow[]> => {
-    const rows = await request<ApiStanding[]>(`/groups/${groupId}/standings`);
-    return rows.map(toStandingRow);
+    const { data } = await request<Wrapped<ApiStanding[]>>(`/groups/${groupId}/standings`);
+    return data.map(toStandingRow);
   },
 
   bracket: async (stageId: number): Promise<Bracket> => {
-    const data = await request<ApiBracket>(`/stages/${stageId}/bracket`);
+    const { data } = await request<Wrapped<ApiBracket>>(`/stages/${stageId}/bracket`);
     return {
       stageId,
       champion: toTeam(data.champion),
@@ -168,21 +229,18 @@ export const api = {
     };
   },
 
-  /** Submit a result; owner-only. Returns standings (group) or bracket (KO). */
-  submitResult: (
+  /* --- owner write --- */
+  /** Submit a group-stage result; returns the recomputed standings. */
+  submitGroupResult: async (
     token: string,
     fixtureId: number,
-    payload: {
-      home_score: number;
-      away_score: number;
-      expected_version: number;
-      home_penalties?: number | null;
-      away_penalties?: number | null;
-    },
-  ) =>
-    request<ApiStanding[] | ApiBracket>(`/matches/${fixtureId}/result`, {
+    payload: { home_score: number; away_score: number; expected_version: number },
+  ): Promise<StandingRow[]> => {
+    const { data } = await request<Wrapped<ApiStanding[]>>(`/matches/${fixtureId}/result`, {
       method: "PUT",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: authHeader(token),
       body: JSON.stringify(payload),
-    }),
+    });
+    return data.map(toStandingRow);
+  },
 };

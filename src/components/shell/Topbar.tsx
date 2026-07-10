@@ -1,5 +1,6 @@
 import type { TournamentMeta } from "@/lib/types";
 import { PhasePills } from "./PhasePills";
+import { UserMenu } from "./UserMenu";
 
 /**
  * The topbar carries identity, not navigation: tournament name in serif, the
@@ -21,6 +22,8 @@ export function Topbar({ meta }: { meta: TournamentMeta }) {
       <div className="flex-1" />
 
       <PhasePills phases={meta.phases} />
+      <div className="ml-1 h-6 w-px bg-line sm:ml-2" />
+      <UserMenu />
     </header>
   );
 }

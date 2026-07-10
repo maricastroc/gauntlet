@@ -6,8 +6,10 @@ import { NextCard } from "@/components/overview/NextCard";
 import { StatTiles } from "@/components/overview/StatTiles";
 import { getOverview } from "@/lib/data";
 
-export default function OverviewPage() {
-  const { featuredGroup, liveFixture, nextFixture, stats } = getOverview();
+export const dynamic = "force-dynamic";
+
+export default async function OverviewPage() {
+  const { featuredGroup, liveFixture, nextFixture, stats } = await getOverview();
 
   return (
     <div className="pb-8">
