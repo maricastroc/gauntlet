@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { FixtureDetail, GroupDetail } from "@/lib/types";
+import { Select } from "@/components/ui/Select";
 import { useFixtureResult } from "./useFixtureResult";
 import { ResultEditor } from "./ResultEditor";
 import { ConsequenceTable } from "./ConsequenceTable";
@@ -30,21 +31,21 @@ export function ConsoleScreen({ groups }: { groups: GroupDetail[] }) {
   return (
     <div>
       <div className="px-5 pt-2 sm:px-6">
-        <label className="mb-2 block font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-mute">
+        <span className="mb-2 block font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-mute">
           Match
-        </label>
-        <select
-          value={selected.fixture.id}
-          onChange={(event) => setSelectedId(Number(event.target.value))}
-          className="w-full max-w-130 rounded-[9px] border border-line-2 bg-surface-2 px-3 py-2.5 text-[13.5px] text-ink outline-none focus:border-amber-line"
-        >
-          {fixtures.map(({ fixture, group }) => (
-            <option key={fixture.id} value={fixture.id}>
-              Group {group.name}: {fixture.home?.name} vs {fixture.away?.name}
-              {fixture.status === "finished" ? ` (${fixture.homeScore}–${fixture.awayScore})` : ""}
-            </option>
-          ))}
-        </select>
+        </span>
+        <Select
+          value={String(selected.fixture.id)}
+          onValueChange={(next) => setSelectedId(Number(next))}
+          ariaLabel="Match"
+          triggerClassName="w-full max-w-130"
+          items={fixtures.map(({ fixture, group }) => ({
+            value: String(fixture.id),
+            label: `Group ${group.name}: ${fixture.home?.name} vs ${fixture.away?.name}${
+              fixture.status === "finished" ? ` (${fixture.homeScore}–${fixture.awayScore})` : ""
+            }`,
+          }))}
+        />
       </div>
 
       <FixtureConsole key={selected.fixture.id} fixture={selected.fixture} group={selected.group} />

@@ -1,9 +1,13 @@
+import type { LucideIcon } from "lucide-react";
+import { IconInput } from "@/components/ui/IconInput";
+
 export function AuthField({
   label,
   type,
   value,
   autoComplete,
   placeholder,
+  icon,
   onChange,
 }: {
   label: string;
@@ -11,6 +15,7 @@ export function AuthField({
   value: string;
   autoComplete: string;
   placeholder?: string;
+  icon: LucideIcon;
   onChange: (value: string) => void;
 }) {
   return (
@@ -18,13 +23,15 @@ export function AuthField({
       <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-mute">
         {label}
       </span>
-      <input
+      <IconInput
+        icon={icon}
         type={type}
         value={value}
         autoComplete={autoComplete}
         placeholder={placeholder}
-        onChange={(event) => onChange(event.target.value)}
-        className="rounded-[9px] border border-line-2 bg-surface-2 px-3.5 py-3 text-[15px] text-ink outline-none transition-colors duration-150 placeholder:text-ink-mute focus:border-amber-line"
+        onChange={onChange}
+        clearLabel={`Clear ${label.toLowerCase()}`}
+        className="rounded-[9px] border border-line-2 bg-surface-2 py-3 text-[15px] text-ink outline-none transition-colors duration-150 placeholder:text-ink-mute focus:border-amber-line"
       />
     </label>
   );

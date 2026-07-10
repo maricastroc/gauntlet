@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Lock, Mail } from "lucide-react";
 import { useAuth } from "@/lib/auth/context";
 import { ApiError } from "@/lib/api/client";
 import { AuthField } from "@/components/auth/AuthField";
@@ -49,6 +50,8 @@ export default function LoginPage() {
           type="email"
           value={email}
           autoComplete="username"
+          placeholder="you@example.com"
+          icon={Mail}
           onChange={setEmail}
         />
         <AuthField
@@ -56,6 +59,8 @@ export default function LoginPage() {
           type="password"
           value={password}
           autoComplete="current-password"
+          placeholder="Your password"
+          icon={Lock}
           onChange={setPassword}
         />
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Lock, Mail, User } from "lucide-react";
 import { useAuth } from "@/lib/auth/context";
 import { ApiError } from "@/lib/api/client";
 import { AuthField } from "@/components/auth/AuthField";
@@ -53,6 +54,7 @@ export default function RegisterPage() {
           value={name}
           autoComplete="name"
           placeholder="Your name"
+          icon={User}
           onChange={setName}
         />
         <AuthField
@@ -61,6 +63,7 @@ export default function RegisterPage() {
           value={email}
           autoComplete="email"
           placeholder="you@example.com"
+          icon={Mail}
           onChange={setEmail}
         />
         <div className="flex flex-col gap-1.5">
@@ -70,6 +73,7 @@ export default function RegisterPage() {
             value={password}
             autoComplete="new-password"
             placeholder="At least 8 characters"
+            icon={Lock}
             onChange={setPassword}
           />
           <span

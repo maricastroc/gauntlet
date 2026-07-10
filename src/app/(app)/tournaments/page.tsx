@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { PageHeading } from "@/components/ui/PageHeading";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { api } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/context";
 import { setCurrentTournamentCookie } from "@/lib/tournament/select";
@@ -22,6 +23,7 @@ export default function TournamentsPage() {
   const router = useRouter();
   const [tournaments, setTournaments] = useState<TournamentSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [toDelete, setToDelete] = useState<TournamentSummary | null>(null);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -104,13 +106,30 @@ export default function TournamentsPage() {
                 isDemo={tournament.id === DEMO_TOURNAMENT_ID}
                 onView={() => view(tournament.id)}
                 onDelete={
-                  tournament.id === DEMO_TOURNAMENT_ID ? undefined : () => remove(tournament.id)
+                  tournament.id === DEMO_TOURNAMENT_ID ? undefined : () => setToDelete(tournament)
                 }
               />
             ))}
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={toDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setToDelete(null);
+        }}
+        title="Delete tournament?"
+        description={
+          toDelete
+            ? `"${toDelete.name}" and all of its teams, fixtures and results will be permanently deleted. This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete tournament"
+        onConfirm={() => {
+          if (toDelete) remove(toDelete.id);
+        }}
+      />
     </div>
   );
 }
