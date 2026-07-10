@@ -19,6 +19,9 @@ export function Rail() {
       <Link
         href="/"
         aria-label="Bracket — home"
+        data-tooltip-id="app-tooltip"
+        data-tooltip-content="Home"
+        data-tooltip-place="right"
         className="mb-0 grid h-8.5 w-8.5 place-items-center rounded-[9px] bg-linear-to-br from-amber to-[#C9791F] font-serif text-[17px] font-extrabold text-[#1a1205] shadow-[0_4px_14px_-4px_rgba(242,169,59,0.6)] transition-transform duration-200 hover:scale-105 md:mb-3.5"
       >
         B
@@ -30,9 +33,11 @@ export function Rail() {
           <Link
             key={item.href}
             href={item.href}
-            title={item.label}
             aria-label={item.label}
             aria-current={active ? "page" : undefined}
+            data-tooltip-id="app-tooltip"
+            data-tooltip-content={item.label}
+            data-tooltip-place="right"
             className={[
               "grid h-10 w-10 place-items-center rounded-[10px] border transition-colors duration-200 [&_svg]:h-4.75 [&_svg]:w-4.75",
               active

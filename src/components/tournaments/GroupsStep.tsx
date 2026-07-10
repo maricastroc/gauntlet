@@ -12,6 +12,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
+import { GripVertical } from "lucide-react";
 import type { Team } from "@/lib/types";
 import { distribute, groupOptions, GROUP_LETTERS } from "@/lib/tournament/draft";
 import { Field, Segmented, StepCard, WizardButton } from "./wizard";
@@ -68,7 +69,7 @@ export function GroupsStep({
 
   return (
     <StepCard title="Split into groups">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid max-w-[560px] grid-cols-2 gap-4">
         <Field label="Groups">
           <Segmented
             options={groupOptions(teams.length)}
@@ -87,7 +88,7 @@ export function GroupsStep({
         onDragEnd={handleDragEnd}
         onDragCancel={() => setActiveId(null)}
       >
-        <div className="mt-4 grid grid-cols-2 gap-2.5">
+        <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-2.5">
           {groups.map((teamIds, index) => (
             <div key={index} className="rounded-[9px] border border-line bg-surface p-3">
               <div className="mb-1.5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-amber-ink">
@@ -105,7 +106,8 @@ export function GroupsStep({
         {activeTeam &&
           createPortal(
             <DragOverlay dropAnimation={null}>
-              <div className="flex cursor-grabbing items-center gap-2 rounded-[7px] border border-amber-line bg-surface-3 px-2 py-1 text-[13px] text-ink shadow-lg">
+              <div className="flex cursor-grabbing items-center gap-2 rounded-[7px] border border-amber-line bg-surface-3 px-2 py-1.5 text-[13px] text-ink shadow-lg">
+                <GripVertical className="h-3.5 w-3.5 shrink-0 text-amber-ink" aria-hidden="true" />
                 <span>{activeTeam.flag}</span>
                 <span className="truncate">{activeTeam.name}</span>
               </div>
@@ -114,7 +116,8 @@ export function GroupsStep({
           )}
       </DndContext>
 
-      <p className="mt-2.5 font-mono text-[10.5px] uppercase tracking-[0.1em] text-ink-mute">
+      <p className="mt-3 flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.1em] text-ink-dim">
+        <GripVertical className="h-3.5 w-3.5 text-amber-ink/70" aria-hidden="true" />
         Drag a team onto another to swap their spots
       </p>
 
@@ -156,14 +159,18 @@ function TeamChip({ team }: { team?: Team }) {
       {...drag.listeners}
       {...drag.attributes}
       className={[
-        "flex cursor-grab items-center gap-2 rounded-[7px] border px-2 py-1 text-[13px] transition-colors",
+        "group flex cursor-grab items-center gap-2 rounded-[7px] border px-2 py-1.5 text-[13px] transition-colors active:cursor-grabbing",
         drag.isDragging
           ? "border-dashed border-line-2 text-ink-mute opacity-50"
           : drop.isOver
             ? "border-amber-line bg-amber/10 text-ink"
-            : "border-transparent text-ink-dim hover:border-line-2",
+            : "border-line bg-surface-2/50 text-ink-dim hover:border-amber-line/60 hover:bg-surface-3 hover:text-ink",
       ].join(" ")}
     >
+      <GripVertical
+        aria-hidden="true"
+        className="h-3.5 w-3.5 shrink-0 text-ink-mute transition-colors group-hover:text-amber-ink"
+      />
       <span>{team.flag}</span>
       <span className="truncate">{team.name}</span>
     </li>

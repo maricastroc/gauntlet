@@ -29,7 +29,9 @@ export function UserMenu() {
     <div className="flex items-center gap-2.5">
       <div
         className="grid h-8 w-8 place-items-center rounded-full border border-amber-line bg-amber-soft font-mono text-[11px] font-bold text-amber-ink"
-        title={user.name}
+        data-tooltip-id="app-tooltip"
+        data-tooltip-content={user.name}
+        data-tooltip-place="bottom"
       >
         {initials(user.name)}
       </div>
@@ -37,8 +39,10 @@ export function UserMenu() {
       <button
         type="button"
         onClick={() => logout()}
-        title="Sign out"
         aria-label="Sign out"
+        data-tooltip-id="app-tooltip"
+        data-tooltip-content="Sign out"
+        data-tooltip-place="bottom"
         className="grid h-8 w-8 place-items-center rounded-[8px] text-ink-mute transition-colors duration-150 hover:bg-white/[0.03] hover:text-ink"
       >
         <LogOut className="h-[17px] w-[17px]" />

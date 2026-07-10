@@ -27,7 +27,7 @@ export function ResultEditor({ fixture, result }: ResultEditorProps) {
           type="button"
           onClick={confirm}
           disabled={!dirty || saving}
-          className="flex w-full items-center justify-center rounded-md bg-amber px-4 py-3.5 text-[15px] font-bold text-[#1a1205] shadow-[0_10px_26px_-8px_rgba(242,169,59,0.6)] transition-all duration-150 enabled:hover:-translate-y-0.5 enabled:hover:brightness-110 enabled:hover:shadow-[0_14px_32px_-8px_rgba(242,169,59,0.75)] enabled:active:translate-y-0 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+          className="flex w-full items-center justify-center rounded-md bg-amber px-4 py-3.5 text-[15px] font-bold text-[#1a1205] shadow-[0_5px_16px_-10px_rgba(242,169,59,0.5)] transition-all duration-150 enabled:hover:-translate-y-0.5 enabled:hover:brightness-[1.07] enabled:hover:shadow-[0_9px_22px_-10px_rgba(242,169,59,0.6)] enabled:active:translate-y-0 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
         >
           {saving ? "Saving…" : "Confirm result"}
         </button>

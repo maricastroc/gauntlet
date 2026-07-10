@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { TournamentMeta } from "@/lib/types";
+import { AppTooltip } from "@/components/ui/AppTooltip";
 import { Rail } from "./Rail";
 import { Topbar } from "./Topbar";
 
@@ -13,6 +14,7 @@ export function AppShell({ meta, children }: { meta: TournamentMeta; children: R
           <main className="min-w-0 flex-1">{children}</main>
         </div>
       </div>
+      <AppTooltip />
     </div>
   );
 }

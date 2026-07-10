@@ -22,10 +22,10 @@ export function IconInput({
   ...rest
 }: IconInputProps) {
   return (
-    <div className={`relative ${wrapperClassName}`}>
+    <div className={`group relative ${wrapperClassName}`}>
       <Icon
         aria-hidden="true"
-        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-mute"
+        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-mute transition-colors duration-150 group-focus-within:text-amber-ink"
       />
       <input
         value={value}

@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* react-tooltip, aligned to the design tokens */
+:root:root {
+  --rt-color-dark: var(--color-surface-2);
+  --rt-color-white: var(--color-ink-dim);
+  --rt-opacity: 1;
+}
+
 /* ============================================================================
    Bracket — design system
    Ground truth: docs/mocks/bracket-mocks.html (the high-fidelity reference).

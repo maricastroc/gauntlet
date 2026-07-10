@@ -105,7 +105,7 @@ export default function NewTournamentPage() {
 
     if (built) {
       setCurrentTournamentCookie(tournamentId!);
-      router.push("/standings");
+      router.push("/console");
       router.refresh();
     }
   }
@@ -118,7 +118,7 @@ export default function NewTournamentPage() {
         subtitle="Name it, add the teams, split them into groups — we generate the fixtures and the bracket."
       />
 
-      <div className="max-w-[720px] px-5 sm:px-6">
+      <div className={`${step === 1 ? "max-w-[720px]" : "max-w-[960px]"} px-5 pt-4 sm:px-6`}>
         <Steps step={step} />
 
         {error && (

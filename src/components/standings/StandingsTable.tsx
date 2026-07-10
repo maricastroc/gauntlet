@@ -21,9 +21,9 @@ function GoalDifference({ value }: { value: number }) {
 function Row({ row, qualified }: { row: StandingRow; qualified: boolean }) {
   return (
     <tr className="group transition-colors duration-150 hover:bg-white/[0.015]">
-      <td className="relative w-9 py-3 text-left font-mono text-[13px]">
+      <td className="relative w-10 py-3 pl-4 text-left font-mono text-[13px]">
         {qualified && (
-          <span className="absolute -left-1 bottom-1.5 top-1.5 w-[3px] rounded-full bg-amber sm:-left-0.5" />
+          <span className="absolute bottom-1.5 left-0.5 top-1.5 w-[3px] rounded-full bg-amber" />
         )}
         <span className={qualified ? "font-bold text-amber-ink" : "text-ink-mute"}>
           {row.position}
@@ -73,7 +73,7 @@ export function StandingsTable({ group }: { group: Group }) {
       <table className="w-full border-collapse tabular-nums">
         <thead>
           <tr className="[&_th]:pb-3 [&_th]:font-mono [&_th]:text-[10.5px] [&_th]:font-medium [&_th]:uppercase [&_th]:tracking-[0.08em] [&_th]:text-ink-mute">
-            <th className="w-9 text-left">#</th>
+            <th className="w-10 pl-4 text-left">#</th>
             <th className="pl-1 text-left">Club</th>
             {NUM_COLS.map((col) => (
               <th
