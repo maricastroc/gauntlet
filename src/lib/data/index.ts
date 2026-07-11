@@ -6,6 +6,7 @@ import type {
   Bracket,
   BracketTie,
   Fixture,
+  FixtureDetail,
   Group,
   OverviewData,
   PhasePill,
@@ -187,10 +188,35 @@ export function getOverview(id: number): Promise<OverviewData> {
   );
 }
 
+// Console-editable group fixtures from the mock, mirroring the live shape. Fixture ids follow
+// the same `groupId * 100 + index` scheme as the what-if setup so the two demo paths agree.
+function demoConsoleGroups(): GroupDetail[] {
+  return GROUPS.map((group) => ({
+    id: group.id,
+    name: group.name,
+    qualifyCount: group.qualifyCount,
+    teams: group.teamIds.map(team),
+    fixtures: group.matches.map(
+      (match, index): FixtureDetail => ({
+        id: group.id * 100 + index,
+        tieId: null,
+        home: team(match.homeId),
+        away: team(match.awayId),
+        homeScore: match.homeScore,
+        awayScore: match.awayScore,
+        homePenalties: null,
+        awayPenalties: null,
+        status: "finished",
+        version: 0,
+      }),
+    ),
+  }));
+}
+
 export function getConsoleGroups(id: number): Promise<GroupDetail[]> {
   return withFallback(
     () => liveConsoleGroups(id),
-    () => [],
+    onlyDemo(id, demoConsoleGroups, []),
     `console groups ${id}`,
   );
 }
