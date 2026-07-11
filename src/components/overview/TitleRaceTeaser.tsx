@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { TitleOdd } from "@/lib/types";
-import { formatProbability } from "@/lib/format";
+import { formatProbability, titleBarWidth } from "@/lib/format";
 import { Flag } from "@/components/ui/Flag";
 
 export function TitleRaceTeaser({ odds }: { odds: TitleOdd[] }) {
@@ -31,7 +31,7 @@ export function TitleRaceTeaser({ odds }: { odds: TitleOdd[] }) {
             <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-surface-3">
               <span
                 className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-amber/60 to-amber"
-                style={{ width: `${Math.max(4, odd.prob * 100)}%` }}
+                style={{ width: titleBarWidth(odd.prob) }}
               />
             </span>
             <span className="w-9 shrink-0 text-right font-mono text-[12px] tabular-nums text-amber-ink">
