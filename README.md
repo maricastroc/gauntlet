@@ -20,15 +20,16 @@ reference is the API's `docs/mocks/bracket-mocks.html`.
 
 ## Screens
 
-| Route                | Screen             | What it does                                                                                                                                           |
-| -------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `/`                  | **Overview**       | Answers "what needs my attention now" — next decider, the tightest group, live stats.                                                                  |
-| `/standings`         | **Standings**      | Every group table — qualification zones, tiebreak notes, and a per-team forecast (clinched / out / % to advance).                                      |
-| `/bracket`           | **Bracket**        | The signature screen — a _playable_ knockout (tap a tie, enter the score, the winner advances to the trophy) topped by a Monte-Carlo "title race".     |
-| `/console`           | **Console**        | Edit a result; the projection previews the delta, then a real optimistic-locked write saves it.                                                        |
-| `/tournaments`       | **Tournaments**    | Every tournament you run — open one to view it across the app, or delete it. A sample tournament is always shown.                                      |
-| `/tournaments/new`   | **New tournament** | A three-step wizard — name it, add teams, split into groups — that generates the fixtures and the bracket.                                             |
-| `/login`·`/register` | **Auth**           | Organizer sign-in / sign-up (Sanctum token). Reading is public; signing in unlocks the console and tournament management, and only the owner can save. |
+| Route                | Screen             | What it does                                                                                                                                               |
+| -------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                  | **Overview**       | Answers "what needs my attention now" — next decider, the tightest group, live stats.                                                                      |
+| `/standings`         | **Standings**      | Every group table — qualification zones, tiebreak notes, and a per-team forecast (clinched / out / % to advance).                                          |
+| `/bracket`           | **Bracket**        | The signature screen — a _playable_ knockout (tap a tie, enter the score, the winner advances to the trophy) topped by a Monte-Carlo "title race".         |
+| `/console`           | **Console**        | Edit a result; the projection previews the delta, then a real optimistic-locked write saves it.                                                            |
+| `/what-if`           | **What if?**       | Pin hypothetical results and watch the standings — and the whole bracket — re-project; a shareable, zero-persistence scenario with a propagation timeline. |
+| `/tournaments`       | **Tournaments**    | Every tournament you run — open one to view it across the app, or delete it. A sample tournament is always shown.                                          |
+| `/tournaments/new`   | **New tournament** | A three-step wizard — name it, add teams, split into groups — that generates the fixtures and the bracket.                                                 |
+| `/login`·`/register` | **Auth**           | Organizer sign-in / sign-up (Sanctum token). Reading is public; signing in unlocks the console and tournament management, and only the owner can save.     |
 
 ## Features
 
@@ -43,6 +44,8 @@ reference is the API's `docs/mocks/bracket-mocks.html`.
   who they'll face next. Editing an upstream result cascades down the bracket, so
   it's never left partial. Results persist through the same optimistic-locked
   match endpoint as the group stage (it branches on the tie; a stale edit 409s).
+  Hover any team to trace its **road to the final** — its ties and the slots
+  ahead light up, the rest of the tree dims.
 - **Forecast & odds.** A server-side Monte-Carlo turns the tables into a live
   story. `/bracket` carries a **title race** — each surviving side's chance to
   lift the trophy, simulated over the remaining knockout. `/standings` tags every
@@ -53,6 +56,14 @@ reference is the API's `docs/mocks/bracket-mocks.html`.
   the right previews the exact reorder — rows rising in green, falling in red —
   _before_ you commit. Confirming performs an atomic, optimistic-locked `PUT`
   (`expected_version`); a stale edit returns 409 rather than clobbering.
+- **What if? scenarios.** `/what-if` pins hypothetical results and re-projects the
+  whole tournament without saving a thing — a group result reshuffles the
+  standings _and_ reseeds the bracket, exactly the cascade the API's engines
+  already compute. A **propagation timeline** narrates each consequence in order
+  ("Japan rises to 1st", "Brazil replaces Japan in the quarterfinals", "New
+  champion: …"), and the entire scenario lives in the URL, so a link reproduces
+  it. Works offline too: when the API is unreachable it projects the demo
+  tournament client-side.
 - **Multi-tournament management.** Signed-in organizers get a gallery of their
   tournaments and a build wizard: name the tournament, enter teams (with flags,
   pre-seeded with a suggested roster), then choose the group count, how many
@@ -78,22 +89,28 @@ src/
     types.ts           UI domain model
     format.ts          round names, ordinals, goal-difference display
     standings.ts       pure standings projection (mirrors the API's GroupTable)
-    knockout.ts        pure knockout resolver (advancement, penalties, champion)
+    knockout.ts        pure knockout resolver (advancement, penalties, champion, road-to-final)
     console.ts         console preview helpers (raw matches → standings delta)
     forecast/          Monte-Carlo odds — seeded RNG, model, group + bracket sims
+    whatif/            scenario URL codec + cascade (diff → propagation narrative)
+    hooks/             useScenario (pins → projection), useStandings, useRequest
     auth/              session context (token in localStorage, useAuth)
-    api/client.ts      live API client (reads, auth, tournament CRUD, result submit)
+    api/client.ts      live API client (reads, auth, tournament CRUD, result + scenario)
     tournament/        current-tournament cookie (server + client) + draft/build helpers
     data/
       live.ts          live source: fetch + enrich (PT→English names, flags)
+      scenario.ts      what-if reads: live scenario projection + fallback wiring
+      demo-scenario.ts offline what-if projector (client-side cascade for the demo)
       copa-atlas.ts    "Copa Atlas 2026" demo fixtures (mirrors the API seeder)
       index.ts         public reads: try live, fall back to demo
 ```
 
 **The data seam.** Reads (`getGroups`, `getStandingsView`, `getBracket`,
-`getOverview`, `getConsoleGroups`) take a tournament id and try the live API first, falling
+`getOverview`, `getConsoleGroups`, `getWhatIfSetup`) take a tournament id and try the live API first, falling
 back to the demo fixtures for the demo tournament (id 1) when the API is
-unreachable; other tournaments return safe-empty so nothing crashes. Team names
+unreachable; other tournaments return safe-empty so nothing crashes. The
+what-if projection follows the same seam — `projectScenario` posts to the live
+scenario endpoint and falls back to an offline client-side projector for the demo. Team names
 arrive in Portuguese and are enriched to English + flags via a catalog keyed by
 team id. The **current tournament** is held in a server-readable cookie so the
 SSR screens know which tournament to render without a client round-trip.
