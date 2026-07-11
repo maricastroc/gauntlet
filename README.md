@@ -70,6 +70,12 @@ reference is the API's `docs/mocks/bracket-mocks.html`.
   advance per group, and whether to generate the knockout — with a live
   round-robin preview of the draw. Opening a tournament switches the whole app
   to it; the demo tournament can always be browsed but never deleted.
+- **Isolated demo sandbox.** Signing in as the demo organizer no longer edits
+  shared data. The API clones the sample tournament into a private, per-session
+  copy and login switches the app to it (via the current-tournament cookie), so
+  results persist across refreshes and navigation but never collide with another
+  visitor. A **Reset** control in the topbar restores a clean tournament; the copy
+  expires after a day. Spectators still see the pristine template, read-only.
 - **Auth & ownership.** Reads are public, so anyone can browse. A Sanctum bearer
   token (kept in `localStorage`, validated on mount) unlocks owner actions —
   saving a result, building and deleting tournaments.
