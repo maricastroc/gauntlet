@@ -18,6 +18,7 @@ import type {
   TournamentMeta,
 } from "@/lib/types";
 import { buildTiebreakNote } from "./shared";
+import { knockoutPhases } from "@/lib/tournament/phases";
 
 type TeamMap = Map<number, Team>;
 
@@ -213,35 +214,7 @@ export async function liveMeta(id: number): Promise<TournamentMeta> {
   let phaseLabel = "Group stage";
 
   if (knockout && knockout.ties.length) {
-    const maxRound = Math.max(...knockout.ties.map((tie) => tie.round), 1);
-
-    const roundByTie = new Map(knockout.ties.map((tie) => [tie.id, tie.round]));
-    const total = new Map<number, number>();
-    const decided = new Map<number, number>();
-    for (const tie of knockout.ties) {
-      total.set(tie.round, (total.get(tie.round) ?? 0) + 1);
-    }
-    for (const fixture of knockout.fixtures) {
-      if (fixture.tieId === null || fixture.status !== "finished") continue;
-      const round = roundByTie.get(fixture.tieId);
-      if (round === undefined) continue;
-      decided.set(round, (decided.get(round) ?? 0) + 1);
-    }
-
-    let currentReached = false;
-    for (let round = 1; round <= maxRound; round++) {
-      const complete = (decided.get(round) ?? 0) === (total.get(round) ?? 0);
-      let state: PhasePill["state"];
-      if (complete) {
-        state = "done";
-      } else if (!currentReached) {
-        state = "now";
-        currentReached = true;
-      } else {
-        state = "todo";
-      }
-      phases.push({ key: `r${round}`, label: shortRound(round, maxRound), state });
-    }
+    phases.push(...knockoutPhases(knockout.ties, knockout.fixtures));
     phaseLabel = "Knockout";
   } else {
     const maxRound = projectedKnockoutRounds(detail);
