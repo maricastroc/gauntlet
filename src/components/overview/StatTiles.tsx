@@ -6,7 +6,7 @@ export function StatTiles({ stats }: { stats: OverviewStat[] }) {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="flex-1 rounded-[7px] border border-line bg-surface px-3.5 py-3"
+          className="flex-1 rounded-sm border border-line bg-surface px-3.5 py-3"
         >
           <div className="font-mono text-[22px] font-bold tabular-nums text-ink">{stat.value}</div>
           <div className="mt-1 text-[11px] leading-tight text-ink-mute">{stat.label}</div>

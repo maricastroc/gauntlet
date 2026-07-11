@@ -86,8 +86,8 @@ export function FixtureRow({
         changed
           ? "border-amber-line bg-amber-soft/40"
           : decisive
-            ? "border-amber-line/50 hover:bg-white/[0.015]"
-            : "border-transparent hover:bg-white/[0.015]",
+            ? "border-amber-line/50 hover:bg-white/1.5"
+            : "border-transparent hover:bg-white/1.5",
       ].join(" ")}
     >
       <span className="flex min-w-0 flex-1 items-center justify-end gap-2 text-[13.5px]">

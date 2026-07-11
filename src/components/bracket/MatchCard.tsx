@@ -20,8 +20,8 @@ function Side({ side, tie }: { side: TieSide; tie: BracketTie }) {
     <div
       data-team-id={side.team?.id}
       className={[
-        "flex items-center gap-2.5 rounded-[7px] px-2.5 py-2.5 transition-colors duration-200",
-        role === "win" && "bg-amber/[0.06] motion-safe:animate-advance",
+        "flex items-center gap-2.5 rounded-sm px-2.5 py-2.5 transition-colors duration-200",
+        role === "win" && "bg-amber/6 motion-safe:animate-advance",
         role === "out" && "opacity-[0.72]",
       ]
         .filter(Boolean)

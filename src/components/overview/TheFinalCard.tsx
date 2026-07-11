@@ -24,7 +24,7 @@ export function TheFinalCard({ final }: { final: FinalRecap }) {
     : (home.score ?? 0) > (away.score ?? 0);
 
   return (
-    <div className="rounded-[11px] border border-line bg-surface-2 p-4">
+    <div className="rounded-md border border-line bg-surface-2 p-4">
       <div className="mb-2 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-mute">
         The {roundLabel}
       </div>

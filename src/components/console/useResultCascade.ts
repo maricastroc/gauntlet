@@ -5,12 +5,6 @@ import type { ScenarioProjection } from "@/lib/types";
 import { projectScenario } from "@/lib/data/scenario";
 import { describeCascade, type CascadeStep } from "@/lib/whatif/cascade";
 
-/**
- * Turns a saved result into a tournament-wide "what your result caused" narrative.
- * Keeps the last projected state as a baseline; on each save it re-projects the whole
- * tournament and diffs against that baseline, so the console shows cross-group and
- * bracket ripples — not just the edited group's table.
- */
 export function useResultCascade(tournamentId: number, enabled: boolean) {
   const baseline = useRef<ScenarioProjection | null>(null);
   const requestId = useRef(0);

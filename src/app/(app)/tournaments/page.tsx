@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Plus, Trash2, Trophy } from "lucide-react";
+import { ArrowRight, Plus, Settings2, Trash2, Trophy } from "lucide-react";
 import { PageHeading } from "@/components/ui/PageHeading";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { relativeDate } from "@/lib/format";
@@ -201,22 +201,37 @@ function TournamentCard({
           Open
           <ArrowRight className="h-3.5 w-3.5 transition-transform duration-150 group-hover:translate-x-0.5" />
         </span>
-        {onDelete && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-            aria-label={`Delete ${tournament.name}`}
-            data-tooltip-id="app-tooltip"
-            data-tooltip-content="Delete tournament"
-            data-tooltip-place="top"
-            className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[9px] border border-line text-ink-mute transition-colors duration-150 hover:border-loss/40 hover:text-loss"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {!isDemo && (
+            <Link
+              href={`/tournaments/${tournament.id}/manage`}
+              onClick={(e) => e.stopPropagation()}
+              aria-label={`Manage ${tournament.name}`}
+              data-tooltip-id="app-tooltip"
+              data-tooltip-content="Manage tournament"
+              data-tooltip-place="top"
+              className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[9px] border border-line text-ink-mute transition-colors duration-150 hover:border-amber-line hover:text-amber-ink"
+            >
+              <Settings2 className="h-4 w-4" />
+            </Link>
+          )}
+          {onDelete && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              aria-label={`Delete ${tournament.name}`}
+              data-tooltip-id="app-tooltip"
+              data-tooltip-content="Delete tournament"
+              data-tooltip-place="top"
+              className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[9px] border border-line text-ink-mute transition-colors duration-150 hover:border-loss/40 hover:text-loss"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

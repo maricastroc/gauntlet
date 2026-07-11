@@ -21,7 +21,7 @@ export function Steps({ step }: { step: number }) {
               {n}
             </span>
             <span
-              className={`font-mono text-[11px] uppercase tracking-[0.1em] transition-colors duration-200 ${active ? "text-ink" : done ? "text-ink-dim" : "text-ink-mute"}`}
+              className={`font-mono text-[11px] uppercase tracking-widest transition-colors duration-200 ${active ? "text-ink" : done ? "text-ink-dim" : "text-ink-mute"}`}
             >
               {label}
             </span>
@@ -74,7 +74,7 @@ export function Segmented({
           type="button"
           onClick={() => onChange(option)}
           className={[
-            "flex-1 rounded-[7px] border py-2.5 text-[13px] transition-all duration-150 active:scale-[0.98]",
+            "flex-1 rounded-sm border py-2.5 text-[13px] transition-all duration-150 active:scale-[0.98]",
             option === value
               ? "border-amber-line bg-amber-soft text-amber-ink"
               : "border-line bg-surface-2 text-ink-mute hover:border-line-2 hover:text-ink-dim",
@@ -101,7 +101,7 @@ export function WizardButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="mt-6 flex w-full items-center justify-center rounded-[12px] bg-amber px-4 py-3.5 text-[15px] font-bold text-[#1a1205] shadow-[0_5px_16px_-10px_rgba(242,169,59,0.5)] transition-all duration-150 enabled:hover:-translate-y-0.5 enabled:hover:brightness-[1.07] enabled:hover:shadow-[0_9px_22px_-10px_rgba(242,169,59,0.6)] enabled:active:translate-y-0 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+      className="mt-6 flex w-full items-center justify-center rounded-xl bg-amber px-4 py-3.5 text-[15px] font-bold text-[#1a1205] shadow-[0_5px_16px_-10px_rgba(242,169,59,0.5)] transition-all duration-150 enabled:hover:-translate-y-0.5 enabled:hover:brightness-[1.07] enabled:hover:shadow-[0_9px_22px_-10px_rgba(242,169,59,0.6)] enabled:active:translate-y-0 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
     >
       {children}
     </button>

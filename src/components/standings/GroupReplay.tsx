@@ -13,12 +13,6 @@ const TICK = 900;
 const iconButton =
   "grid h-7 w-7 place-items-center rounded-md border border-line-2 text-ink-dim transition-colors hover:text-ink disabled:opacity-40";
 
-/**
- * Replays how a group's table was built, result by result. Each step re-projects the
- * standings from a prefix of the matches, so the table reorders (with the shared FLIP
- * animation) exactly as it did on the way to the final standings — the same
- * re-project-over-prefixes machinery a simulated tournament would replay.
- */
 export function GroupReplay({
   teams,
   qualifyCount,
@@ -55,7 +49,7 @@ export function GroupReplay({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-3 flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute transition-colors hover:text-amber-ink"
+        className="mt-3 flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest text-ink-mute transition-colors hover:text-amber-ink"
       >
         ▸ Replay how this group unfolded
       </button>

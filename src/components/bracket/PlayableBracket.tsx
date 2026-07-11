@@ -114,7 +114,7 @@ export function PlayableBracket({ initial }: { initial: BracketData }) {
     <div>
       {champion && (
         <div className="px-5 pt-4 sm:px-6">
-          <div className="motion-safe:animate-trophy flex flex-wrap items-center justify-center gap-2 rounded-[11px] border border-gold/45 bg-gradient-to-b from-gold/[0.14] to-surface-2 px-4 py-3 text-center">
+          <div className="motion-safe:animate-trophy flex flex-wrap items-center justify-center gap-2 rounded-md border border-gold/45 bg-linear-to-b from-gold/[0.14] to-surface-2 px-4 py-3 text-center">
             <span className="text-[20px]" aria-hidden="true">
               🏆
             </span>
@@ -163,7 +163,7 @@ export function PlayableBracket({ initial }: { initial: BracketData }) {
 
 function ChampionSlot({ champion }: { champion: Team | null }) {
   return (
-    <div className={champion ? "motion-safe:animate-trophy rounded-[11px]" : undefined}>
+    <div className={champion ? "motion-safe:animate-trophy rounded-md" : undefined}>
       <ChampionCard champion={champion} />
     </div>
   );

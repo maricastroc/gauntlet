@@ -199,6 +199,7 @@ export interface TournamentDetail {
   id: number;
   name: string;
   status: TournamentStatus;
+  canManage?: boolean;
   teams: Team[];
   stages: StageDetail[];
 }

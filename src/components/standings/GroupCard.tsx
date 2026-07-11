@@ -14,7 +14,7 @@ export function GroupCard({
   matches?: RawMatch[];
 }) {
   return (
-    <section className="rounded-[11px] border border-line bg-surface-2/60 p-5">
+    <section className="rounded-md border border-line bg-surface-2/60 p-5">
       <header className="mb-3 flex items-center justify-between">
         <p className="flex items-center gap-2.5">
           <span className="eyebrow">Group</span>
@@ -22,7 +22,7 @@ export function GroupCard({
             {group.name}
           </span>
         </p>
-        <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-ink-mute">
+        <span className="font-mono text-[10.5px] uppercase tracking-widest text-ink-mute">
           top {group.qualifyCount} advance
         </span>
       </header>

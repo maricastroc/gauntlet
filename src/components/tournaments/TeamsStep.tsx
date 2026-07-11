@@ -40,7 +40,7 @@ export function TeamsStep({ drafts, setDrafts, validCount, busy, onSubmit }: Tea
               type="button"
               onClick={() => setDrafts((d) => d.filter((_, i) => i !== index))}
               aria-label={`Remove team ${index + 1}`}
-              className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-[9px] border border-line text-ink-mute transition-colors hover:border-loss/40 hover:text-loss"
+              className="grid h-9.5 w-9.5 shrink-0 place-items-center rounded-[9px] border border-line text-ink-mute transition-colors hover:border-loss/40 hover:text-loss"
             >
               <X className="h-4 w-4" />
             </button>

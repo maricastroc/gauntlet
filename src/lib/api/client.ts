@@ -127,6 +127,7 @@ interface ApiTournamentDetail {
   id: number;
   name: string;
   status: TournamentStatus;
+  can_manage?: boolean;
   teams: ApiTeamFull[];
   stages: ApiStageDetail[];
 }
@@ -320,6 +321,7 @@ function toTournamentDetail(detail: ApiTournamentDetail): TournamentDetail {
     id: detail.id,
     name: detail.name,
     status: detail.status,
+    canManage: detail.can_manage ?? false,
     teams: detail.teams.map(toTeamFull),
     stages: detail.stages.map(toStageDetail),
   };
@@ -432,8 +434,11 @@ export const api = {
     return data.map(toTournamentSummary);
   },
 
-  getTournament: cache(async (id: number): Promise<TournamentDetail> => {
-    const { data } = await request<Wrapped<ApiTournamentDetail>>(`/tournaments/${id}`);
+  getTournament: cache(async (id: number, token?: string): Promise<TournamentDetail> => {
+    const { data } = await request<Wrapped<ApiTournamentDetail>>(
+      `/tournaments/${id}`,
+      token ? { headers: authHeader(token) } : undefined,
+    );
     return toTournamentDetail(data);
   }),
 
@@ -448,6 +453,28 @@ export const api = {
 
   deleteTournament: (token: string, id: number): Promise<void> =>
     request<void>(`/tournaments/${id}`, { method: "DELETE", headers: authHeader(token) }),
+
+  updateTournament: async (token: string, id: number, name: string): Promise<TournamentSummary> => {
+    const { data } = await request<Wrapped<ApiTournamentSummary>>(`/tournaments/${id}`, {
+      method: "PATCH",
+      headers: authHeader(token),
+      body: JSON.stringify({ name }),
+    });
+    return toTournamentSummary(data);
+  },
+
+  updateTeam: async (
+    token: string,
+    tournamentId: number,
+    teamId: number,
+    changes: { name?: string; code?: string | null; flag?: string | null },
+  ): Promise<Team> => {
+    const { data } = await request<Wrapped<ApiTeamFull>>(
+      `/tournaments/${tournamentId}/teams/${teamId}`,
+      { method: "PATCH", headers: authHeader(token), body: JSON.stringify(changes) },
+    );
+    return toTeamFull(data);
+  },
 
   addTeams: async (
     token: string,

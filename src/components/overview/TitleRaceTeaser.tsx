@@ -9,14 +9,14 @@ export function TitleRaceTeaser({ odds }: { odds: TitleOdd[] }) {
   if (top.length === 0) return null;
 
   return (
-    <div className="rounded-[11px] border border-line bg-surface-2 p-4">
+    <div className="rounded-md border border-line bg-surface-2 p-4">
       <div className="mb-3 flex items-center justify-between">
         <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-mute">
           Title race
         </span>
         <Link
           href="/bracket"
-          className="flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.1em] text-amber-ink transition-colors hover:text-amber"
+          className="flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest text-amber-ink transition-colors hover:text-amber"
         >
           Full forecast
           <ArrowRight className="h-3 w-3" />
@@ -30,7 +30,7 @@ export function TitleRaceTeaser({ odds }: { odds: TitleOdd[] }) {
             <span className="w-20 shrink-0 truncate text-[13px] text-ink">{odd.team.name}</span>
             <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-surface-3">
               <span
-                className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-amber/60 to-amber"
+                className="absolute inset-y-0 left-0 rounded-full bg-linear-to-r from-amber/60 to-amber"
                 style={{ width: titleBarWidth(odd.prob) }}
               />
             </span>

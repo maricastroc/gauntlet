@@ -15,7 +15,7 @@ export function FormChips({ form }: { form: ResultLetter[] }) {
       {form.map((result, index) => (
         <span
           key={index}
-          className={`grid h-[18px] w-[18px] place-items-center rounded-[5px] font-mono text-[10px] font-bold text-ground ${STYLES[result]}`}
+          className={`grid h-4.5 w-4.5 place-items-center rounded-[5px] font-mono text-[10px] font-bold text-ground ${STYLES[result]}`}
         >
           {LABELS[result]}
         </span>

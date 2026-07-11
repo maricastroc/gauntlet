@@ -5,12 +5,6 @@ import { forecastGroup, type GroupForecast, type GroupSim } from "@/lib/forecast
 
 const DELAY = 250;
 
-/**
- * Debounced group forecast for the live console preview. Running the 4,000-run Monte
- * Carlo on every keystroke would jank, so it settles for a beat after edits, then
- * projects whether each team has clinched or been eliminated given the results so far.
- * Keyed on `sim.key`, which must encode the current results.
- */
 export function useGroupOutlook(sim: GroupSim): GroupForecast | null {
   const [forecast, setForecast] = useState<GroupForecast | null>(null);
 

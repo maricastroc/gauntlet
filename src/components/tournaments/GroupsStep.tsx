@@ -69,7 +69,7 @@ export function GroupsStep({
 
   return (
     <StepCard title="Split into groups">
-      <div className="grid max-w-[560px] grid-cols-2 gap-4">
+      <div className="grid max-w-140 grid-cols-2 gap-4">
         <Field label="Groups">
           <Segmented
             options={groupOptions(teams.length)}
@@ -106,7 +106,7 @@ export function GroupsStep({
         {activeTeam &&
           createPortal(
             <DragOverlay dropAnimation={null}>
-              <div className="flex cursor-grabbing items-center gap-2 rounded-[7px] border border-amber-line bg-surface-3 px-2 py-1.5 text-[13px] text-ink shadow-lg">
+              <div className="flex cursor-grabbing items-center gap-2 rounded-sm border border-amber-line bg-surface-3 px-2 py-1.5 text-[13px] text-ink shadow-lg">
                 <GripVertical className="h-3.5 w-3.5 shrink-0 text-amber-ink" aria-hidden="true" />
                 <span>{activeTeam.flag}</span>
                 <span className="truncate">{activeTeam.name}</span>
@@ -116,7 +116,7 @@ export function GroupsStep({
           )}
       </DndContext>
 
-      <p className="mt-3 flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.1em] text-ink-dim">
+      <p className="mt-3 flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-widest text-ink-dim">
         <GripVertical className="h-3.5 w-3.5 text-amber-ink/70" aria-hidden="true" />
         Drag a team onto another to swap their spots
       </p>
@@ -127,7 +127,7 @@ export function GroupsStep({
           checked={withKnockout && bracketValid}
           disabled={!bracketValid}
           onChange={(e) => setWithKnockout(e.target.checked)}
-          className="h-4 w-4 accent-[var(--color-amber)]"
+          className="h-4 w-4 accent-amber"
         />
         Also generate the knockout bracket
         {!bracketValid && (
@@ -159,7 +159,7 @@ function TeamChip({ team }: { team?: Team }) {
       {...drag.listeners}
       {...drag.attributes}
       className={[
-        "group flex cursor-grab items-center gap-2 rounded-[7px] border px-2 py-1.5 text-[13px] transition-colors active:cursor-grabbing",
+        "group flex cursor-grab items-center gap-2 rounded-sm border px-2 py-1.5 text-[13px] transition-colors active:cursor-grabbing",
         drag.isDragging
           ? "border-dashed border-line-2 text-ink-mute opacity-50"
           : drop.isOver

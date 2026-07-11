@@ -99,7 +99,7 @@ export function CountryCombobox({
         <ul
           role="listbox"
           id={listboxId}
-          className="absolute left-0 right-0 z-30 mt-1.5 max-h-[240px] overflow-auto rounded-[10px] border border-line-2 bg-surface-2 p-1.5 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.6)] motion-safe:animate-rise"
+          className="absolute left-0 right-0 z-30 mt-1.5 max-h-60 overflow-auto rounded-[10px] border border-line-2 bg-surface-2 p-1.5 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.6)] motion-safe:animate-rise"
         >
           {matches.map((country, index) => (
             <li key={country.name}>
@@ -110,7 +110,7 @@ export function CountryCombobox({
                 onMouseDown={(event) => event.preventDefault()}
                 onMouseEnter={() => setHighlight(index)}
                 onClick={() => pick(country)}
-                className={`flex w-full items-center gap-2.5 rounded-[7px] px-2.5 py-2 text-left text-[13px] transition-colors ${
+                className={`flex w-full items-center gap-2.5 rounded-sm px-2.5 py-2 text-left text-[13px] transition-colors ${
                   index === highlight ? "bg-amber-soft text-amber-ink" : "text-ink-dim"
                 }`}
               >

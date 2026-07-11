@@ -20,7 +20,7 @@ export function DemoCallout() {
   }
 
   return (
-    <div className="mt-5 rounded-[11px] border border-line-2 bg-surface-2/60 p-3.5">
+    <div className="mt-5 rounded-md border border-line-2 bg-surface-2/60 p-3.5">
       <div className="flex items-center justify-between">
         <p className="eyebrow text-amber">
           <span className="mr-1.5">◆</span>Demo organizer
@@ -28,7 +28,7 @@ export function DemoCallout() {
         <button
           type="button"
           onClick={copy}
-          className="flex items-center gap-1.5 rounded-[7px] border border-line-2 px-2.5 py-1 font-mono text-[11px] text-ink-dim transition-colors duration-150 hover:border-amber-line hover:text-amber-ink"
+          className="flex items-center gap-1.5 rounded-sm border border-line-2 px-2.5 py-1 font-mono text-[11px] text-ink-dim transition-colors duration-150 hover:border-amber-line hover:text-amber-ink"
         >
           {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
           {copied ? "Copied" : "Copy"}

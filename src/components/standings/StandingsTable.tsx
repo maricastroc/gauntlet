@@ -21,10 +21,10 @@ function GoalDifference({ value }: { value: number }) {
 
 function Row({ row, qualified }: { row: StandingRow; qualified: boolean }) {
   return (
-    <tr className="group transition-colors duration-150 hover:bg-white/[0.015]">
+    <tr className="group transition-colors duration-150 hover:bg-white/1.5">
       <td className="relative w-10 py-3 pl-4 text-left font-mono text-[13px]">
         {qualified && (
-          <span className="absolute bottom-1.5 left-0.5 top-1.5 w-[3px] rounded-full bg-amber" />
+          <span className="absolute bottom-1.5 left-0.5 top-1.5 w-0.75 rounded-full bg-amber" />
         )}
         <span className={qualified ? "font-bold text-amber-ink" : "text-ink-mute"}>
           {row.position}
@@ -100,7 +100,7 @@ export function StandingsTable({ group }: { group: Group }) {
                 <Row row={row} qualified={qualified} />
                 {isCutRow && hasMore && (
                   <tr aria-hidden="true">
-                    <td colSpan={totalCols} className="border-t-0 !py-2">
+                    <td colSpan={totalCols} className="border-t-0 py-2!">
                       <span className="flex items-center gap-3">
                         <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-amber">
                           Qualification line

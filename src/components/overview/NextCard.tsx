@@ -3,7 +3,7 @@ import { Flag } from "@/components/ui/Flag";
 
 export function NextCard({ fixture }: { fixture: Fixture }) {
   return (
-    <div className="rounded-[11px] border border-line bg-surface-2 p-4">
+    <div className="rounded-md border border-line bg-surface-2 p-4">
       <div className="mb-3.5 flex items-center justify-between">
         <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-mute">
           {fixture.groupName}
