@@ -80,7 +80,6 @@ describe("titleOddsFrom", () => {
   });
 
   it("gives a team already in the final a higher share than a first-round team", () => {
-    // Slot 1 decided for team A → A is in the final regardless of the other tie.
     const bracket = bracketWith([
       { id: 10, winnerId: 1, status: "decided" },
       { id: 20, home: side(team(1, "A")) },

@@ -38,18 +38,18 @@ describe("groupOptions", () => {
 
 describe("isBracketValid", () => {
   it("accepts configurations producing a power-of-two bracket", () => {
-    expect(isBracketValid(4, 2)).toBe(true); // 8 qualifiers
-    expect(isBracketValid(8, 2)).toBe(true); // 16 qualifiers
-    expect(isBracketValid(4, 1)).toBe(true); // 4 qualifiers
+    expect(isBracketValid(4, 2)).toBe(true);
+    expect(isBracketValid(8, 2)).toBe(true);
+    expect(isBracketValid(4, 1)).toBe(true);
   });
 
   it("rejects totals that are not 4, 8 or 16", () => {
-    expect(isBracketValid(3, 2)).toBe(false); // 6
-    expect(isBracketValid(5, 2)).toBe(false); // 10
+    expect(isBracketValid(3, 2)).toBe(false);
+    expect(isBracketValid(5, 2)).toBe(false);
   });
 
   it("rejects two-per-group with an odd number of groups", () => {
     expect(isBracketValid(2, 2)).toBe(true);
-    expect(isBracketValid(6, 2)).toBe(false); // 12, not a valid total anyway
+    expect(isBracketValid(6, 2)).toBe(false);
   });
 });

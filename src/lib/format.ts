@@ -44,9 +44,6 @@ export function formatProbability(prob: number): string {
   return `${Math.round(prob * 100)}%`;
 }
 
-// Bar width for a title-race probability, as a CSS percentage. The small floor keeps
-// long-shot teams visible. Shared so the overview teaser and the full /bracket forecast
-// always render the same scale.
 export function titleBarWidth(prob: number): string {
   return `${Math.max(4, prob * 100)}%`;
 }

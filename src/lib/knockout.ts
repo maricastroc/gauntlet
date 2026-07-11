@@ -47,9 +47,6 @@ function feederLabel(tie: BracketTie, side: "home" | "away", maxRound: number): 
 
 const key = (round: number, slot: number) => `${round}:${slot}`;
 
-// Rebuild the whole tree from the recorded results: round-one seeding stays put,
-// every deeper slot is re-derived from the winners feeding into it. A single edit
-// upstream cascades all the way to the trophy, so the bracket is never partial.
 export function resolveBracket(base: BracketTie[], results: TieResults): ResolvedBracket {
   const maxRound = Math.max(...base.map((tie) => tie.round), 1);
 
@@ -119,8 +116,6 @@ export function resolveBracket(base: BracketTie[], results: TieResults): Resolve
   return { ties, champion };
 }
 
-// The ids of the ties on a team's line to the trophy: the ties it appears in, plus the
-// forward slots it would advance through — stopping short if it was already knocked out.
 export function roadToFinal(ties: BracketTie[], teamId: number): Set<number> {
   const road = new Set<number>();
   const occupied = ties.filter(

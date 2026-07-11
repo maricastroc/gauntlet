@@ -12,9 +12,7 @@ const hrefFor = (phase: PhasePill) => (phase.key === "groups" ? "/standings" : "
 
 export function PhasePills({ phases }: { phases: PhasePill[] }) {
   const pathname = usePathname();
-  // The pills act as tabs: highlight the one matching the current page. On routes
-  // that aren't a pill target (e.g. the overview), fall back to the tournament's
-  // live phase so a sensible stage stays lit.
+
   const routeHref = pathname.startsWith("/standings")
     ? "/standings"
     : pathname.startsWith("/bracket")

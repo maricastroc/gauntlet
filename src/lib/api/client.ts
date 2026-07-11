@@ -406,9 +406,6 @@ export const api = {
     return data.map(toStandingRow);
   },
 
-  // Knockout results post to the same endpoint as group results — the API branches on
-  // the fixture's tie, records the score + penalties under an optimistic version lock,
-  // resolves the winner, advances them, and returns the re-resolved bracket.
   submitKnockoutResult: async (
     token: string,
     fixtureId: number,
@@ -435,8 +432,6 @@ export const api = {
     return data.map(toTournamentSummary);
   },
 
-  // Deduped per server render: the layout (meta) and page (view) both need the
-  // full tournament, and each render pass fetches it exactly once.
   getTournament: cache(async (id: number): Promise<TournamentDetail> => {
     const { data } = await request<Wrapped<ApiTournamentDetail>>(`/tournaments/${id}`);
     return toTournamentDetail(data);

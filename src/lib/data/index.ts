@@ -188,8 +188,6 @@ export function getOverview(id: number): Promise<OverviewData> {
   );
 }
 
-// Console-editable group fixtures from the mock, mirroring the live shape. Fixture ids follow
-// the same `groupId * 100 + index` scheme as the what-if setup so the two demo paths agree.
 function demoConsoleGroups(): GroupDetail[] {
   return GROUPS.map((group) => ({
     id: group.id,
@@ -221,7 +219,6 @@ export function getConsoleGroups(id: number): Promise<GroupDetail[]> {
   );
 }
 
-// Standings enriched with a qualification forecast per team (for the standings screen).
 export async function getStandingsView(id: number): Promise<Group[]> {
   const [groups, consoleGroups] = await Promise.all([getGroups(id), getConsoleGroups(id)]);
   return attachOutlookToGroups(groups, consoleGroups, id);

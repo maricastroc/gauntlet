@@ -27,14 +27,13 @@ export function PlayableBracket({ initial }: { initial: BracketData }) {
   const authed = status === "authed" && token !== null;
 
   const base = useMemo(() => initial.ties, [initial.ties]);
-  // Live when the bracket is backed by real matches; otherwise it's the local demo.
+
   const live = useMemo(() => base.some((tie) => tie.fixtureId != null), [base]);
 
   const [results, setResults] = useState<TieResults>(new Map());
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Live brackets arrive already resolved by the server; the demo resolves locally.
   const { ties, champion } = useMemo(
     () => (live ? { ties: base, champion: initial.champion } : resolveBracket(base, results)),
     [live, base, initial.champion, results],

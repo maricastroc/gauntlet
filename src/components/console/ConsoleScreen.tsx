@@ -1,22 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import type { FixtureDetail, GroupDetail } from "@/lib/types";
-import { Select } from "@/components/ui/Select";
-import { useFixtureResult } from "./useFixtureResult";
-import { ResultEditor } from "./ResultEditor";
-import { ConsequenceTable } from "./ConsequenceTable";
+import type { GroupDetail } from "@/lib/types";
+import { GroupEditor } from "./GroupEditor";
 
 export function ConsoleScreen({ groups }: { groups: GroupDetail[] }) {
-  const fixtures = groups.flatMap((group) =>
-    group.fixtures
-      .filter((fixture) => fixture.home && fixture.away)
-      .map((fixture) => ({ fixture, group })),
-  );
+  const editable = groups.filter((group) => group.fixtures.some((f) => f.home && f.away));
+  const [selectedName, setSelectedName] = useState(editable[0]?.name ?? "");
 
-  const [selectedId, setSelectedId] = useState<number | null>(fixtures[0]?.fixture.id ?? null);
-
-  if (fixtures.length === 0) {
+  if (editable.length === 0) {
     return (
       <div className="px-5 pt-2 sm:px-6">
         <div className="rounded-md border border-dashed border-line-2 px-6 py-12 text-center text-[14px] text-ink-mute">
@@ -26,62 +18,35 @@ export function ConsoleScreen({ groups }: { groups: GroupDetail[] }) {
     );
   }
 
-  const selected = fixtures.find((f) => f.fixture.id === selectedId) ?? fixtures[0];
-
-  const matchSelect = (
-    <div>
-      <span className="mb-2 block font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-mute">
-        Match
-      </span>
-      <Select
-        value={String(selected.fixture.id)}
-        onValueChange={(next) => setSelectedId(Number(next))}
-        ariaLabel="Match"
-        triggerClassName="w-full"
-        items={fixtures.map(({ fixture, group }) => ({
-          value: String(fixture.id),
-          label: `Group ${group.name}: ${fixture.home?.name} vs ${fixture.away?.name}${
-            fixture.status === "finished" ? ` (${fixture.homeScore}–${fixture.awayScore})` : ""
-          }`,
-        }))}
-      />
-    </div>
-  );
+  const group = editable.find((g) => g.name === selectedName) ?? editable[0];
 
   return (
-    <FixtureConsole
-      key={selected.fixture.id}
-      fixture={selected.fixture}
-      group={selected.group}
-      matchSelect={matchSelect}
-    />
-  );
-}
-
-function FixtureConsole({
-  fixture,
-  group,
-  matchSelect,
-}: {
-  fixture: FixtureDetail;
-  group: GroupDetail;
-  matchSelect: React.ReactNode;
-}) {
-  const result = useFixtureResult(fixture, group);
-
-  return (
-    <div className="grid grid-cols-1 gap-y-8 lg:grid-cols-2 lg:gap-y-0">
-      <div className="min-w-0 px-5 pt-2 pb-6 sm:px-6 lg:border-r lg:border-line">
-        {matchSelect}
-        <ResultEditor fixture={fixture} result={result} />
+    <div className="px-5 pt-2 sm:px-6">
+      <div className="mb-1.5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-mute">
+        Group
       </div>
-      <ConsequenceTable
-        groupName={group.name}
-        dirty={result.dirty}
-        base={result.base}
-        preview={result.preview}
-        previewKey={`${result.home}-${result.away}`}
-      />
+      <div className="flex flex-wrap gap-2">
+        {editable.map((option) => {
+          const active = option.name === group.name;
+          return (
+            <button
+              key={option.name}
+              type="button"
+              onClick={() => setSelectedName(option.name)}
+              className={[
+                "rounded-md border px-3.5 py-1.5 font-mono text-[12px] tracking-[0.06em] transition-colors",
+                active
+                  ? "border-amber bg-amber font-bold text-[#1a1205]"
+                  : "border-line-2 text-ink-dim hover:border-amber-line hover:text-ink",
+              ].join(" ")}
+            >
+              {option.name}
+            </button>
+          );
+        })}
+      </div>
+
+      <GroupEditor key={group.name} group={group} />
     </div>
   );
 }

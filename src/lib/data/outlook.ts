@@ -14,9 +14,6 @@ function toRawMatch(fixture: FixtureDetail): RawMatch | null {
   };
 }
 
-// Attach a per-team qualification forecast to a group's standings. `detail` carries the
-// fixtures (played + scheduled); without it, or once every game is played, the table is
-// final and each row simply clinches or is eliminated by rank.
 export function attachOutlook(
   group: Group,
   detail: GroupDetail | undefined,

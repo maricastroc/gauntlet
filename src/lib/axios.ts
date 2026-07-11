@@ -1,9 +1,6 @@
 import axios, { type AxiosError } from "axios";
 import { API_BASE_URL, ApiError } from "@/lib/api/client";
 
-// Client-side HTTP layer for SWR hooks. Server Components keep using the fetch
-// client in `@/lib/api/client`; this instance is for interactive pages that
-// need caching, dedup, and revalidation (see `useRequest`).
 export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: { Accept: "application/json", "Content-Type": "application/json" },
@@ -19,8 +16,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Normalize every failure into the shared ApiError so `displayMessage`,
-// `isVersionConflict`, and `fieldErrors` behave the same as the fetch client.
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {

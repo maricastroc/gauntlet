@@ -15,8 +15,8 @@ export default async function ConsolePage() {
     <div className="pb-8">
       <PageHeading
         eyebrow="Console"
-        title="Edit a result"
-        subtitle="Pick a match, adjust the score, and watch the group table recalculate — then save it, atomically."
+        title="Edit results"
+        subtitle="Pick a group, adjust any score in place, and watch the table recalculate. Each result saves on its own, atomically."
       />
       <ConsoleScreen groups={groups} />
     </div>

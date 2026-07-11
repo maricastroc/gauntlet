@@ -80,7 +80,6 @@ async function bracketFromDetail(detail: TournamentDetail, teams: TeamMap): Prom
 
   const bracket = await api.bracket(stage.id);
 
-  // Knockout fixtures carry the played score and the writable handle (id + version).
   const fixtureByTie = new Map<number, FixtureDetail>();
   for (const fixture of stage.fixtures) {
     if (fixture.tieId !== null) fixtureByTie.set(fixture.tieId, fixture);
@@ -116,7 +115,6 @@ async function bracketFromDetail(detail: TournamentDetail, teams: TeamMap): Prom
     tie.slot = slot;
   }
 
-  // Undecided sides read "Winner QF1" etc., derived from the feeding round + slot.
   const maxRound = Math.max(...ties.map((tie) => tie.round), 1);
   for (const tie of ties) {
     if (tie.round === 1) continue;

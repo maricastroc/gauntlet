@@ -12,8 +12,6 @@ import type {
   TieSide,
 } from "@/lib/types";
 
-// How up-for-grabs a group still is: Σ p(1−p) over the advance odds — peaks when a spot
-// is a coin-flip, drops to zero once every team is settled.
 function unsettledScore(group: Group): number {
   return group.standings.reduce((sum, row) => {
     const prob = row.advanceProb ?? (row.qualified ? 1 : 0);
@@ -21,7 +19,6 @@ function unsettledScore(group: Group): number {
   }, 0);
 }
 
-// Gap across the qualification line — points first, then goal difference. Smaller = tighter.
 function cutMargin(group: Group): number {
   const last = group.standings[group.qualifyCount - 1];
   const first = group.standings[group.qualifyCount];
@@ -29,8 +26,6 @@ function cutMargin(group: Group): number {
   return (last.points - first.points) * 1000 + (last.goalDifference - first.goalDifference);
 }
 
-// The group most worth watching: least settled by the forecast, breaking ties toward the
-// tightest cut line (which is what carries a fully-played stage where every odd is 0 or 1).
 export function pickFeaturedGroup(groups: Group[]): Group | null {
   if (groups.length === 0) return null;
   return groups
@@ -39,7 +34,6 @@ export function pickFeaturedGroup(groups: Group[]): Group | null {
 }
 
 function nextGroupFixture(consoleGroups: GroupDetail[], featured: Group | null): Fixture | null {
-  // Look at the most in-play group first, so "next up" points at what's actually at stake.
   const ordered = featured
     ? [...consoleGroups].sort((a, b) => Number(b.id === featured.id) - Number(a.id === featured.id))
     : consoleGroups;
@@ -85,8 +79,6 @@ function nextReadyTie(bracket: Bracket): Fixture | null {
   };
 }
 
-// The next unplayed match that matters — a scheduled group game while the groups are still
-// running, otherwise the next knockout tie whose two sides are known.
 export function pickNextFixture(
   consoleGroups: GroupDetail[],
   featured: Group | null,
@@ -95,7 +87,6 @@ export function pickNextFixture(
   return nextGroupFixture(consoleGroups, featured) ?? nextReadyTie(bracket);
 }
 
-// A score from one side's perspective: "2–0", or "1–1 (4–2 pens)" when penalties settled it.
 function scoreLine(mine: TieSide, theirs: TieSide, byPenalties: boolean): string {
   const base = `${mine.score ?? 0}–${theirs.score ?? 0}`;
   if (byPenalties && mine.penalties != null && theirs.penalties != null) {
@@ -104,7 +95,6 @@ function scoreLine(mine: TieSide, theirs: TieSide, byPenalties: boolean): string
   return base;
 }
 
-// The champion's run to the title: every tie they won, round by round.
 function championRoad(bracket: Bracket, maxRound: number): RoadStep[] {
   const championId = bracket.champion?.id;
   if (championId == null) return [];
@@ -125,7 +115,6 @@ function championRoad(bracket: Bracket, maxRound: number): RoadStep[] {
     });
 }
 
-// The championship match — the top-round tie the champion played in.
 function finalTie(bracket: Bracket, maxRound: number): BracketTie | null {
   const championId = bracket.champion?.id;
   return (
@@ -172,7 +161,6 @@ function collectPlayed(groupFixtures: FixtureDetail[], bracket: Bracket): Played
   return [...fromGroups, ...fromTies];
 }
 
-// Tournament-wide highlights, drawn from the final group tables and every played match.
 function superlatives(groups: Group[], bracket: Bracket, groupFixtures: FixtureDetail[]): Superlative[] {
   const out: Superlative[] = [];
   const rows = groups.flatMap((group) => group.standings).filter((row) => row.played > 0);
@@ -223,7 +211,6 @@ function superlatives(groups: Group[], bracket: Bracket, groupFixtures: FixtureD
   return out;
 }
 
-// The full end-of-tournament recap — null until a champion is crowned.
 export function buildRecap(
   bracket: Bracket,
   groups: Group[],

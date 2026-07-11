@@ -6,7 +6,6 @@ const groupA = (p: ReturnType<typeof demoProjectScenario>) =>
 const tie = (p: ReturnType<typeof demoProjectScenario>, id: number) =>
   p.bracket!.ties.find((t) => t.id === id)!;
 
-// group.id * 100 + index — the Brazil vs Japan group A opener.
 const BRAZIL_JAPAN = 100;
 
 describe("demoProjectScenario", () => {
@@ -30,13 +29,12 @@ describe("demoProjectScenario", () => {
 
     expect(a.standings[0].team.name).toBe("Japan");
     expect(a.standings[1].team.name).toBe("Brazil");
-    // tie 1 is A1 vs B2 (Japan now tops A); A2 (Brazil) is the away seed of tie 5 (B1 vs A2).
+
     expect(tie(p, 1).home.team?.name).toBe("Japan");
     expect(tie(p, 5).away.team?.name).toBe("Brazil");
   });
 
   it("advances the winner of a pinned knockout result up the bracket", () => {
-    // tie 6 is an unplayed Round-of-16 (Portugal vs Germany); it feeds the away slot of QF tie 11.
     const p = demoProjectScenario([{ fixtureId: 6, homeScore: 2, awayScore: 0 }]);
 
     expect(tie(p, 6).winnerId).toBe(13);
@@ -45,7 +43,7 @@ describe("demoProjectScenario", () => {
 
   it("leaves the recorded demo results in place when unrelated", () => {
     const p = demoProjectScenario([]);
-    // tie 1 is a pre-played R16 (Brazil win); it cascades into the home slot of QF tie 9.
+
     expect(tie(p, 1).winnerId).toBe(1);
     expect(tie(p, 9).home.team?.name).toBe("Brazil");
   });

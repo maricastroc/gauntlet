@@ -56,8 +56,8 @@ describe("ratingsFromStandings", () => {
       { id: 1, name: "A", qualifyCount: 2, standings: [row(1, 3, 6, 9), row(2, 0, 0, 0)] },
     ];
     const ratings = ratingsFromStandings(groups);
-    expect(ratings.get(2)).toBe(0); // unplayed
-    expect(ratings.get(1)!).toBeGreaterThan(0); // dominant record
+    expect(ratings.get(2)).toBe(0);
+    expect(ratings.get(1)!).toBeGreaterThan(0);
   });
 });
 

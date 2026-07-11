@@ -2,7 +2,6 @@
 
 import { Toaster } from "react-hot-toast";
 
-// Dark stadium theme — surface panel, hairline border, amber/loss accents.
 export function AppToaster() {
   return (
     <Toaster

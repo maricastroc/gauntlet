@@ -14,7 +14,6 @@ const team = (id: number, name: string): Team => ({ id, name });
 
 const side = (t: Team | null): TieSide => ({ team: t, score: null, penalties: null });
 
-// A 4-team bracket: two round-one ties feeding a single final.
 function baseBracket(): BracketTie[] {
   const [a, b, c, d] = [team(1, "A"), team(2, "B"), team(3, "C"), team(4, "D")];
   return [
@@ -109,8 +108,8 @@ describe("resolveBracket", () => {
     ]);
     const { ties } = resolveBracket(baseBracket(), results);
     const final = ties.find((t) => t.id === 20)!;
-    expect(final.home.team?.id).toBe(1); // winner of slot 1
-    expect(final.away.team?.id).toBe(4); // winner of slot 2
+    expect(final.home.team?.id).toBe(1);
+    expect(final.away.team?.id).toBe(4);
     expect(final.status).toBe("ready");
   });
 

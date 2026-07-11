@@ -1,4 +1,3 @@
-// @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import type { PhasePill } from "@/lib/types";
@@ -34,9 +33,9 @@ describe("PhasePills", () => {
 
   it("locks phases that haven't been reached yet", () => {
     render(<PhasePills phases={PHASES} />);
-    // Locked phases are not navigable links...
+
     expect(screen.queryByRole("link", { name: "Go to Semis" })).toBeNull();
-    // ...they render as disabled markers with an unlock hint.
+
     const semis = screen.getByText("Semis");
     expect(semis).toHaveAttribute("aria-disabled", "true");
     expect(semis).toHaveAttribute("data-tooltip-content", "Finish the Quarters to unlock");
@@ -59,7 +58,7 @@ describe("PhasePills", () => {
   it("falls back to the live phase on routes that aren't a pill target", () => {
     pathname.mockReturnValue("/");
     render(<PhasePills phases={PHASES} />);
-    // Quarters is the tournament's live phase (state: "now").
+
     expect(linkTo("Quarters")).toHaveAttribute("aria-current", "page");
     expect(linkTo("Groups")).not.toHaveAttribute("aria-current");
   });

@@ -25,9 +25,7 @@ export function ConsequenceTable({
         ◆ Consequence · Group {groupName}
       </p>
       <p className="mb-4 text-[12.5px] text-ink-mute">
-        {dirty
-          ? "Reordered on confirm. Preview before saving:"
-          : "Live table from the results so far."}
+        {dirty ? "Recalculating as you edit." : "Live table from the results so far."}
       </p>
 
       <div

@@ -28,7 +28,6 @@ export interface StandingRow {
   points: number;
   form: ResultLetter[];
   qualified: boolean;
-  // forecast: chance of finishing in the top `qualifyCount`, and the derived outlook
   advanceProb?: number;
   outlook?: QualificationOutlook;
 }
@@ -65,7 +64,6 @@ export interface BracketTie {
   decidedByPenalties: boolean;
   kickoff?: string;
   liveMinute?: number;
-  // the knockout match backing this tie — the writable handle for saving a result
   fixtureId?: number;
   version?: number;
 }

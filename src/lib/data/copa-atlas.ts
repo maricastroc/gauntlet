@@ -93,7 +93,6 @@ export interface TieSeed {
   slot: number;
   homeId: number | null;
   awayId: number | null;
-  // Group-stage seed each round-one side is drawn from, e.g. "A1", "B2" (round-one only).
   homeSeed?: string;
   awaySeed?: string;
   homeSourceLabel?: string;
@@ -115,8 +114,6 @@ interface KnockoutResult {
   awayPenalties?: number;
 }
 
-// Round-of-16 results already played, by slot — mirrors the backend TournamentDemoSeeder.
-// The rest of the bracket is still to come; winners cascade from these.
 const R16_RESULTS: Record<number, KnockoutResult> = {
   1: { homeScore: 3, awayScore: 1 },
   2: { homeScore: 1, awayScore: 1, homePenalties: 5, awayPenalties: 4 },
@@ -139,8 +136,6 @@ function decideWinner(homeId: number, awayId: number, result: KnockoutResult): n
   return (result.homePenalties ?? 0) > (result.awayPenalties ?? 0) ? homeId : awayId;
 }
 
-// Build the whole bracket from the group qualifiers, mirroring the backend KnockoutSeeder
-// pairing and cascading Round-of-16 winners forward. Keeps demo mode in step with the API.
 function buildTies(): TieSeed[] {
   const names = GROUPS.map((group) => group.name).sort();
   const pairs: Array<[string, string]> = [];

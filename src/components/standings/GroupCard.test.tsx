@@ -1,4 +1,3 @@
-// @vitest-environment jsdom
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import type { Group, StandingRow } from "@/lib/types";
@@ -63,9 +62,9 @@ describe("GroupCard", () => {
 
   it("translates each team's outlook into a badge", () => {
     render(<GroupCard group={GROUP} />);
-    expect(screen.getByText("through")).toBeInTheDocument(); // clinched
-    expect(screen.getByText("out")).toBeInTheDocument(); // eliminated
-    expect(screen.getByText("62%")).toBeInTheDocument(); // contending probability
+    expect(screen.getByText("through")).toBeInTheDocument();
+    expect(screen.getByText("out")).toBeInTheDocument();
+    expect(screen.getByText("62%")).toBeInTheDocument();
   });
 
   it("draws the qualification line under the last qualifying place", () => {

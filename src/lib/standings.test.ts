@@ -57,13 +57,12 @@ describe("computeStandings", () => {
 
   it("ranks by points, then goal difference, then goals scored", () => {
     const matches: RawMatch[] = [
-      // Brazil and Argentina both win once → tie on points, split on GD
-      { homeId: 1, awayId: 3, homeScore: 4, awayScore: 0 }, // Brazil +4
-      { homeId: 2, awayId: 4, homeScore: 1, awayScore: 0 }, // Argentina +1
+      { homeId: 1, awayId: 3, homeScore: 4, awayScore: 0 },
+      { homeId: 2, awayId: 4, homeScore: 1, awayScore: 0 },
     ];
     const rows = computeStandings(teams, matches, 2);
-    expect(rows[0].team.id).toBe(1); // Brazil, better GD
-    expect(rows[1].team.id).toBe(2); // Argentina
+    expect(rows[0].team.id).toBe(1);
+    expect(rows[1].team.id).toBe(2);
   });
 
   it("breaks a full tie by original seed order", () => {

@@ -7,8 +7,6 @@ const RUNS = 20000;
 
 const slotKey = (round: number, slot: number, side: "home" | "away") => `${round}:${slot}:${side}`;
 
-// One playthrough of the remaining knockout: decided ties keep their winner, undecided
-// ones are sampled from the ratings, and each winner flows into its parent slot.
 function playOnce(
   ties: BracketTie[],
   rounds: number[],
@@ -46,7 +44,6 @@ function playOnce(
   return champion;
 }
 
-// Championship odds for every side still alive in the bracket.
 export function titleOddsFrom(bracket: Bracket, groups: Group[]): TitleOdd[] {
   const ties = bracket.ties;
   if (!ties.some((tie) => tie.home.team && tie.away.team)) return [];

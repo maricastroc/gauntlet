@@ -47,7 +47,6 @@ describe("forecastGroup", () => {
   });
 
   it("clinches a team that has already locked a top spot", () => {
-    // Three finished matches leave one team on max points with no games left.
     const played: RawMatch[] = [
       { homeId: 1, awayId: 2, homeScore: 5, awayScore: 0 },
       { homeId: 1, awayId: 3, homeScore: 5, awayScore: 0 },

@@ -9,17 +9,15 @@ export interface GroupForecast {
 }
 
 export interface GroupSim {
-  key: string; // stable seed source (changes when results change)
+  key: string;
   teams: Team[];
   played: RawMatch[];
-  remaining: Array<[number, number]>; // [homeId, awayId] of scheduled games
+  remaining: Array<[number, number]>;
   qualifyCount: number;
 }
 
 const RUNS = 4000;
 
-// Monte Carlo over a group's remaining games: each team's probability of finishing in
-// the top `qualifyCount`, and whether that spot is already clinched or mathematically gone.
 export function forecastGroup(group: GroupSim): GroupForecast {
   const ratings = ratingsFromMatches(group.teams, group.played);
   const rng = mulberry32(hashString(group.key));

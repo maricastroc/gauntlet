@@ -15,9 +15,6 @@ export async function getCurrentTournamentId(): Promise<number> {
     return DEMO_TOURNAMENT_ID;
   }
 
-  // A stale cookie can point to a tournament that no longer exists — e.g. after a
-  // reseed or a deletion. Rather than rendering an empty shell forever, ignore it
-  // and fall back to the demo tournament.
   if (LIVE_ENABLED && !(await tournamentExists(id))) {
     return DEMO_TOURNAMENT_ID;
   }
@@ -30,8 +27,6 @@ async function tournamentExists(id: number): Promise<boolean> {
     await api.getTournament(id);
     return true;
   } catch (error) {
-    // Only a definitive 404 means "gone" — keep the id on transient errors so a
-    // real tournament isn't demoted to the demo on a network blip.
     if (error instanceof ApiError && error.status === 404) return false;
     return true;
   }

@@ -18,16 +18,12 @@ export interface Config<Data> extends Omit<SWRConfiguration<AxiosResponse, ApiEr
   fallbackData?: Data;
 }
 
-// A stable cache key from method + url + serialized params. `null` request
-// disables the fetch (SWR conditional fetching).
 function keyOf(request: GetRequest): string | null {
   if (!request) return null;
   const query = request.params ? `?${qs.stringify(request.params)}` : "";
   return `${request.method ?? "GET"} ${request.url}${query}`;
 }
 
-// Laravel API resources wrap payloads as `{ data, meta?, links? }`. Pull `data`
-// out and surface the rest as `meta` — explicit, no guessing at the first key.
 function unwrap<Data>(body: unknown): {
   data: Data | undefined;
   meta: Record<string, unknown> | undefined;
