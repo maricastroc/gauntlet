@@ -445,13 +445,22 @@ export const api = {
     return data.map(toTournamentSummary);
   },
 
-  getTournament: cache(async (id: number, token?: string): Promise<TournamentDetail> => {
-    const { data } = await request<Wrapped<ApiTournamentDetail>>(
-      `/tournaments/${id}`,
-      token ? { headers: authHeader(token) } : undefined,
-    );
+  getTournament: cache(async (id: number): Promise<TournamentDetail> => {
+    const { data } = await request<Wrapped<ApiTournamentDetail>>(`/tournaments/${id}`);
     return toTournamentDetail(data);
   }),
+
+  /**
+   * The tournament detail fetched WITH the caller's token, so `canManage` reflects the
+   * backend policy (owner, template read-only, …). Deliberately not `cache()`-wrapped:
+   * the manage screen needs the authoritative, token-scoped answer every time.
+   */
+  getManagedTournament: async (token: string, id: number): Promise<TournamentDetail> => {
+    const { data } = await request<Wrapped<ApiTournamentDetail>>(`/tournaments/${id}`, {
+      headers: authHeader(token),
+    });
+    return toTournamentDetail(data);
+  },
 
   createTournament: async (token: string, name: string): Promise<TournamentSummary> => {
     const { data } = await request<Wrapped<ApiTournamentSummary>>("/tournaments", {

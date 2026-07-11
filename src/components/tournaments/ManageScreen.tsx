@@ -19,7 +19,7 @@ export function ManageScreen({ tournamentId }: { tournamentId: number }) {
     let active = true;
     (async () => {
       try {
-        const loaded = await api.getTournament(tournamentId, token);
+        const loaded = await api.getManagedTournament(token, tournamentId);
         if (active) setDetail(loaded);
       } catch (err) {
         if (active) notifyApiError(err);
