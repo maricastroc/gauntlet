@@ -1,4 +1,4 @@
-import type { GroupDetail, StandingRow } from "@/lib/types";
+import type { GroupDetail, QualificationOutlook, StandingRow } from "@/lib/types";
 import type { RawMatch } from "@/lib/standings";
 import { formatGoalDifference, ordinal } from "@/lib/format";
 
@@ -54,4 +54,18 @@ export function describeMove(base: StandingRow | undefined, next: StandingRow): 
       text: `${base.points}→${next.points} pts`,
     };
   return { dir: "none", text: `held ${ordinal(next.position)}` };
+}
+
+/**
+ * A not-yet-played match still decides qualification if at least one team's fate is
+ * open. If both are already settled (clinched or eliminated), it is a dead rubber:
+ * its result cannot change who advances.
+ */
+export function matchDecidesQualification(
+  outlook: Map<number, QualificationOutlook> | null,
+  homeId: number | undefined,
+  awayId: number | undefined,
+): boolean {
+  if (!outlook || homeId === undefined || awayId === undefined) return false;
+  return outlook.get(homeId) === "contending" || outlook.get(awayId) === "contending";
 }

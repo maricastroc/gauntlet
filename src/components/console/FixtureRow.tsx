@@ -68,19 +68,26 @@ export function FixtureRow({
   row,
   authed,
   onChange,
+  decisive = false,
 }: {
   fixture: FixtureDetail;
   row: RowState;
   authed: boolean;
   onChange: (side: "home" | "away", value: number) => void;
+  decisive?: boolean;
 }) {
   const changed = row.home !== row.savedHome || row.away !== row.savedAway;
 
   return (
     <div
+      title={decisive ? "This match still decides who advances" : undefined}
       className={[
         "flex items-center gap-2.5 rounded-[10px] border px-2.5 py-2 transition-colors",
-        changed ? "border-amber-line bg-amber-soft/40" : "border-transparent hover:bg-white/[0.015]",
+        changed
+          ? "border-amber-line bg-amber-soft/40"
+          : decisive
+            ? "border-amber-line/50 hover:bg-white/[0.015]"
+            : "border-transparent hover:bg-white/[0.015]",
       ].join(" ")}
     >
       <span className="flex min-w-0 flex-1 items-center justify-end gap-2 text-[13.5px]">

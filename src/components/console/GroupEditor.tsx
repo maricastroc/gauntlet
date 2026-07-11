@@ -2,7 +2,8 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import type { GroupDetail } from "@/lib/types";
+import type { FixtureDetail, GroupDetail } from "@/lib/types";
+import { matchDecidesQualification } from "@/lib/console";
 import { useGroupEditor } from "./useGroupEditor";
 import { useGroupOutlook } from "./useGroupOutlook";
 import { FixtureRow } from "./FixtureRow";
@@ -34,6 +35,17 @@ export function GroupEditor({ group, onSaved }: { group: GroupDetail; onSaved?: 
       }))
     : editor.preview;
 
+  const decisiveFor = (fixture: FixtureDetail): boolean => {
+    const row = editor.rows[fixture.id];
+    const changed = row && (row.home !== row.savedHome || row.away !== row.savedAway);
+    if (row?.finished || changed) return false;
+    return matchDecidesQualification(
+      forecast?.outlook ?? null,
+      fixture.home?.id,
+      fixture.away?.id,
+    );
+  };
+
   return (
     <div className="mt-5 grid grid-cols-1 gap-y-8 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-0">
       <div className="min-w-0 lg:border-r lg:border-line lg:pr-8">
@@ -60,6 +72,7 @@ export function GroupEditor({ group, onSaved }: { group: GroupDetail; onSaved?: 
               fixture={fixture}
               row={editor.rows[fixture.id]}
               authed={editor.authed}
+              decisive={decisiveFor(fixture)}
               onChange={(side, value) => editor.setScore(fixture.id, side, value)}
             />
           ))}
