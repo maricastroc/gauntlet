@@ -6,8 +6,10 @@ import { Link2, Trophy } from "lucide-react";
 import type { ScenarioResult, WhatIfSetup } from "@/lib/types";
 import { useScenario } from "@/lib/hooks/useScenario";
 import { encodeScenario } from "@/lib/whatif/scenario-url";
+import { describeCascade } from "@/lib/whatif/cascade";
 import { Flag } from "@/components/ui/Flag";
 import { ScenarioBuilder } from "./ScenarioBuilder";
+import { CascadeTimeline } from "./CascadeTimeline";
 import { ProjectedStandings } from "./ProjectedStandings";
 import { ProjectedBracket } from "./ProjectedBracket";
 
@@ -26,6 +28,7 @@ export function WhatIfScreen({
     initialPins,
   );
   const dirty = pins.size > 0;
+  const cascade = describeCascade(setup.baseline, projection);
   const champion = projection.bracket?.champion ?? null;
   const baseChampion = setup.baseline.bracket?.champion ?? null;
   const championChanged = dirty && (champion?.id ?? null) !== (baseChampion?.id ?? null);
@@ -83,6 +86,8 @@ export function WhatIfScreen({
       </div>
 
       <div className="min-w-0 px-5 pt-2 pb-6 sm:px-6">
+        <CascadeTimeline steps={cascade} />
+
         <div className="mb-4 flex items-center justify-between gap-3">
           <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-amber">
             ◆ {dirty ? "Projected" : "Live"} tables

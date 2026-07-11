@@ -4,6 +4,7 @@ import {
   isDraw,
   resolveBracket,
   resolvedSide,
+  roadToFinal,
   type TieResult,
   type TieResults,
 } from "@/lib/knockout";
@@ -155,5 +156,25 @@ describe("resolveBracket", () => {
       new Map<number, TieResult>([[10, { home: 0, away: 2 }]]),
     );
     expect(flipped.ties.find((t) => t.id === 20)!.home.team?.id).toBe(2);
+  });
+});
+
+describe("roadToFinal", () => {
+  it("traces a team's ties plus the forward slots to the final", () => {
+    expect(roadToFinal(baseBracket(), 1)).toEqual(new Set([10, 20]));
+    expect(roadToFinal(baseBracket(), 3)).toEqual(new Set([11, 20]));
+  });
+
+  it("stops at the tie where the team was knocked out", () => {
+    const ties = baseBracket();
+    const semi = ties.find((t) => t.id === 10)!;
+    semi.status = "decided";
+    semi.winnerId = 1;
+    expect(roadToFinal(ties, 2)).toEqual(new Set([10]));
+    expect(roadToFinal(ties, 1)).toEqual(new Set([10, 20]));
+  });
+
+  it("returns an empty set for a team not in the bracket", () => {
+    expect(roadToFinal(baseBracket(), 99)).toEqual(new Set());
   });
 });

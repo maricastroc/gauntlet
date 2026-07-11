@@ -118,3 +118,26 @@ export function resolveBracket(base: BracketTie[], results: TieResults): Resolve
 
   return { ties, champion };
 }
+
+// The ids of the ties on a team's line to the trophy: the ties it appears in, plus the
+// forward slots it would advance through — stopping short if it was already knocked out.
+export function roadToFinal(ties: BracketTie[], teamId: number): Set<number> {
+  const road = new Set<number>();
+  const occupied = ties.filter(
+    (tie) => tie.home.team?.id === teamId || tie.away.team?.id === teamId,
+  );
+  if (occupied.length === 0) return road;
+  occupied.forEach((tie) => road.add(tie.id));
+
+  const furthest = occupied.reduce((a, b) => (b.round > a.round ? b : a));
+  if (furthest.status === "decided" && furthest.winnerId !== teamId) return road;
+
+  const byKey = new Map(ties.map((tie) => [key(tie.round, tie.slot), tie]));
+  let current: BracketTie | undefined = furthest;
+  while (current) {
+    road.add(current.id);
+    const child = childOf(current);
+    current = byKey.get(key(child.round, child.slot));
+  }
+  return road;
+}

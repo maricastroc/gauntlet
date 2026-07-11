@@ -4,7 +4,7 @@ import { LiveBadge } from "@/components/ui/LiveBadge";
 
 export function LiveCard({ fixture }: { fixture: Fixture }) {
   return (
-    <div className="rounded-[11px] border border-loss/30 bg-gradient-to-b from-loss/[0.05] to-surface-2 p-4">
+    <div className="rounded-md border border-loss/30 bg-linear-to-b from-loss/5 to-surface-2 p-4">
       <div className="mb-3.5 flex items-center justify-between">
         <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-mute">
           {fixture.groupName}
@@ -18,12 +18,12 @@ export function LiveCard({ fixture }: { fixture: Fixture }) {
           <span className="truncate">{fixture.home.name}</span>
         </div>
 
-        <div className="min-w-[62px] text-center">
+        <div className="min-w-15.5 text-center">
           <div className="font-mono text-[22px] font-bold tracking-[0.04em] tabular-nums">
             {fixture.homeScore} – {fixture.awayScore}
           </div>
           {fixture.liveMinute != null && (
-            <div className="mt-0.5 font-mono text-[10px] font-semibold tracking-[0.1em] text-loss">
+            <div className="mt-0.5 font-mono text-[10px] font-semibold tracking-widest text-loss">
               {fixture.liveMinute}&apos;
             </div>
           )}

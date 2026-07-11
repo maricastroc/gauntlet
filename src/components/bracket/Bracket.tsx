@@ -1,6 +1,9 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useMemo, useState, type ReactNode } from "react";
 import type { Bracket as BracketData, BracketTie } from "@/lib/types";
 import { roundName } from "@/lib/format";
+import { roadToFinal } from "@/lib/knockout";
 import { MatchCard } from "./MatchCard";
 import { ChampionCard } from "./ChampionCard";
 import { HEADER_SPACER, PairConnector, StraightConnector } from "./Connectors";
@@ -27,11 +30,13 @@ function RoundColumn({
   round,
   maxRound,
   renderCard,
+  road,
 }: {
   matches: BracketTie[];
   round: number;
   maxRound: number;
   renderCard: (tie: BracketTie) => ReactNode;
+  road: Set<number> | null;
 }) {
   return (
     <div className="flex w-[212px] shrink-0 flex-col">
@@ -39,7 +44,13 @@ function RoundColumn({
       <div className="flex flex-1 flex-col">
         {matches.map((tie) => (
           <div key={tie.id} className="flex flex-1 items-center py-2">
-            <div className="w-full">{renderCard(tie)}</div>
+            <div
+              className={`w-full transition-opacity duration-200 ${
+                road && !road.has(tie.id) ? "opacity-30" : "opacity-100"
+              }`}
+            >
+              {renderCard(tie)}
+            </div>
           </div>
         ))}
       </div>
@@ -58,8 +69,24 @@ export function Bracket({ data, renderCard, championSlot }: BracketProps) {
   const maxRound = rounds.length;
   const card = renderCard ?? ((tie: BracketTie) => <MatchCard tie={tie} />);
 
+  const [hoveredTeamId, setHoveredTeamId] = useState<number | null>(null);
+  const road = useMemo(
+    () => (hoveredTeamId === null ? null : roadToFinal(data.ties, hoveredTeamId)),
+    [hoveredTeamId, data.ties],
+  );
+
+  const trackHover = (event: React.MouseEvent) => {
+    const target = (event.target as HTMLElement).closest("[data-team-id]");
+    const id = target?.getAttribute("data-team-id");
+    setHoveredTeamId(id ? Number(id) : null);
+  };
+
   return (
-    <div className="overflow-x-auto px-5 pb-8 pt-6 sm:px-6">
+    <div
+      className="overflow-x-auto px-5 pb-8 pt-6 sm:px-6"
+      onMouseOver={trackHover}
+      onMouseLeave={() => setHoveredTeamId(null)}
+    >
       <div className="flex min-w-[820px] items-stretch">
         {rounds.map((matches, index) => {
           const round = index + 1;
@@ -67,7 +94,13 @@ export function Bracket({ data, renderCard, championSlot }: BracketProps) {
           const nextCount = rounds[index + 1]?.length ?? 0;
           return (
             <div key={round} className="flex items-stretch">
-              <RoundColumn matches={matches} round={round} maxRound={maxRound} renderCard={card} />
+              <RoundColumn
+                matches={matches}
+                round={round}
+                maxRound={maxRound}
+                renderCard={card}
+                road={road}
+              />
               {!isLast && <PairConnector pairs={nextCount} />}
             </div>
           );

@@ -10,7 +10,7 @@ export function AppTooltip() {
       noArrow
       offset={7}
       delayShow={80}
-      className="!z-50 !rounded-[7px] !border !border-line-2 !bg-surface-2 !px-2 !py-1 !font-mono !text-[9.5px] !uppercase !tracking-[0.08em] !text-ink-dim !shadow-[0_10px_26px_-12px_rgba(0,0,0,0.75)]"
+      className="z-50! rounded-sm! border! border-line-2! bg-surface-2! px-2! py-1! font-mono! text-[9.5px]! uppercase! tracking-[0.08em]! text-ink-dim! shadow-[0_10px_26px_-12px_rgba(0,0,0,0.75)]!"
     />
   );
 }
