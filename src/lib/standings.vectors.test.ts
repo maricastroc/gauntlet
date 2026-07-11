@@ -12,8 +12,6 @@ interface Vector {
   expected: number[];
 }
 
-// Shared byte-for-byte with the API engine (tournament-game-api: tests/Vectors/standings.json).
-// Both suites run these vectors; a drift in either engine breaks its build. Keep the copies identical.
 const vectorsPath = path.join(process.cwd(), "test-vectors", "standings.json");
 const suite = JSON.parse(readFileSync(vectorsPath, "utf8")) as { cases: Vector[] };
 

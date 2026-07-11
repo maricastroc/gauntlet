@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { api, type AuthUser } from "@/lib/api/client";
+import { setCurrentTournamentCookie } from "@/lib/tournament/select";
 
 type Status = "loading" | "authed" | "guest";
 
@@ -58,7 +59,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (email: string, password: string) => {
-      adopt(await api.login(email, password));
+      const result = await api.login(email, password);
+
+      if (result.sandbox_tournament_id) {
+        setCurrentTournamentCookie(result.sandbox_tournament_id);
+      }
+      adopt(result);
     },
     [adopt],
   );

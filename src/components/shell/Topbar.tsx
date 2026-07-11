@@ -1,4 +1,5 @@
 import type { TournamentMeta } from "@/lib/types";
+import { DemoReset } from "./DemoReset";
 import { PhasePills } from "./PhasePills";
 import { UserMenu } from "./UserMenu";
 
@@ -18,6 +19,7 @@ export function Topbar({ meta }: { meta: TournamentMeta }) {
       <div className="flex-1" />
 
       <PhasePills phases={meta.phases} />
+      <DemoReset />
       <div className="ml-1 h-6 w-px bg-line sm:ml-2" />
       <UserMenu />
     </header>

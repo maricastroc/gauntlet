@@ -150,6 +150,8 @@ export interface AuthUser {
 interface AuthResponse {
   user: AuthUser;
   token: string;
+  /** Present only for the demo account: the freshly cloned sandbox to switch to. */
+  sandbox_tournament_id?: number;
 }
 
 export class ApiError extends Error {
@@ -355,6 +357,15 @@ export const api = {
 
   logout: (token: string) =>
     request<void>("/logout", { method: "POST", headers: authHeader(token) }),
+
+  /** Drops this session's demo sandbox and clones a fresh one. Returns its id. */
+  resetDemo: async (token: string): Promise<number> => {
+    const { sandbox_tournament_id } = await request<{ sandbox_tournament_id: number }>(
+      "/demo/reset",
+      { method: "POST", headers: authHeader(token) },
+    );
+    return sandbox_tournament_id;
+  },
 
   standings: async (groupId: number): Promise<StandingRow[]> => {
     const { data } = await request<Wrapped<ApiStanding[]>>(`/groups/${groupId}/standings`);

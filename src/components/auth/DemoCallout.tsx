@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
+import { DEMO_EMAIL } from "@/lib/auth/demo";
 
-const EMAIL = "demo@bracket.test";
+const EMAIL = DEMO_EMAIL;
 const PASSWORD = "password";
 
 export function DemoCallout() {

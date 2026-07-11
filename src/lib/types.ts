@@ -225,7 +225,6 @@ export interface ScenarioProjection {
 export interface WhatIfFixture {
   id: number;
   phase: "group" | "knockout";
-  // Short pill label for the match picker — the group letter, or the knockout round (e.g. "QF").
   phaseLabel: string;
   label: string;
   home: Team;

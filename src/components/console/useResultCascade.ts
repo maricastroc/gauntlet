@@ -33,7 +33,7 @@ export function useResultCascade(tournamentId: number, enabled: boolean) {
     } catch {
       return;
     }
-    if (id !== requestId.current) return; // a newer save superseded this one
+    if (id !== requestId.current) return;
 
     const previous = baseline.current;
     baseline.current = next;
