@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth/context";
 import { notifyApiError } from "@/lib/toast";
 import { AuthField } from "@/components/auth/AuthField";
 import { AuthShell, AuthSubmit } from "@/components/auth/AuthShell";
+import { DemoCallout } from "@/components/auth/DemoCallout";
 
 export default function LoginPage() {
   const { login, status } = useAuth();
@@ -40,7 +41,7 @@ export default function LoginPage() {
     <AuthShell
       eyebrow="Organizer access"
       title="Sign in"
-      subtitle="Reading a tournament is public. Signing in unlocks the organizer console — saving and editing results."
+      subtitle="Edit live scores and every standing, tiebreak and knockout slot recalculates instantly."
     >
       <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-4">
         <AuthField
@@ -74,17 +75,13 @@ export default function LoginPage() {
         </Link>
       </p>
 
-      <p className="mt-4 flex items-center gap-2 rounded-[9px] border border-dashed border-line-2 px-3.5 py-2.5 font-mono text-[11.5px] text-ink-mute">
-        <span className="text-amber">◆</span>
-        Demo organizer — <span className="text-ink-dim">demo@bracket.test</span> ·{" "}
-        <span className="text-ink-dim">password</span>
-      </p>
+      <DemoCallout />
 
       <Link
         href="/"
         className="mt-6 inline-block text-[13px] text-ink-mute transition-colors hover:text-ink-dim"
       >
-        ← Back to the tournament
+        ← Continue as spectator
       </Link>
     </AuthShell>
   );

@@ -18,7 +18,7 @@ export function AuthShell({
         <Link
           href="/"
           aria-label="Gauntlet — home"
-          className="mb-8 inline-block h-[38px] w-[38px] overflow-hidden rounded-[10px] shadow-[0_4px_14px_-4px_rgba(242,169,59,0.5)]"
+          className="mb-6 inline-block h-[42px] w-[42px] overflow-hidden rounded-[11px] shadow-[0_4px_16px_-4px_rgba(242,169,59,0.55)] transition-transform duration-200 hover:scale-105"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icon.svg" alt="" className="h-full w-full" />
@@ -39,7 +39,7 @@ export function AuthSubmit({ children, disabled }: { children: ReactNode; disabl
     <button
       type="submit"
       disabled={disabled}
-      className="mt-1 flex w-full items-center justify-center gap-2 rounded-[11px] bg-amber px-4 py-3.5 text-[14px] font-bold text-[#1a1205] shadow-[0_8px_22px_-8px_rgba(242,169,59,0.6)] transition-all duration-150 enabled:hover:brightness-105 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+      className="mt-1 flex w-full items-center justify-center gap-2 rounded-[11px] bg-amber px-4 py-3.5 text-[14px] font-bold text-[#1a1205] shadow-[0_8px_22px_-8px_rgba(242,169,59,0.6)] transition-all duration-200 enabled:hover:-translate-y-px enabled:hover:brightness-105 enabled:hover:shadow-[0_12px_30px_-8px_rgba(242,169,59,0.75)] enabled:active:translate-y-0 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
     >
       {children}
     </button>

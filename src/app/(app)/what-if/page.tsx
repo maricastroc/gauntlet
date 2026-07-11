@@ -29,7 +29,7 @@ export default async function WhatIfPage({
   );
 
   return (
-    <div className="pb-8">
+    <div className="flex flex-col pb-8 lg:h-full lg:pb-0">
       <PageHeading
         eyebrow="What if?"
         title="Play out a scenario"

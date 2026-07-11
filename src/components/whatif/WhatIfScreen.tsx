@@ -51,43 +51,41 @@ export function WhatIfScreen({
   };
 
   return (
-    <div className="grid grid-cols-1 gap-y-8 lg:grid-cols-[minmax(320px,380px)_1fr] lg:gap-y-0">
-      <div className="min-w-0 px-5 pt-2 pb-6 sm:px-6 lg:border-r lg:border-line">
-        <div className="lg:sticky lg:top-6">
-          <ScenarioBuilder
-            fixtures={setup.fixtures}
-            pins={pins}
-            onPin={pin}
-            onUnpin={unpin}
-            onReset={reset}
-          />
+    <div className="grid grid-cols-1 gap-y-8 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(320px,380px)_1fr] lg:gap-y-0">
+      <div className="min-w-0 px-5 pt-2 pb-6 sm:px-6 lg:min-h-0 lg:overflow-y-auto lg:border-r lg:border-line lg:pb-8">
+        <ScenarioBuilder
+          fixtures={setup.fixtures}
+          pins={pins}
+          onPin={pin}
+          onUnpin={unpin}
+          onReset={reset}
+        />
 
-          {dirty && (
-            <button
-              type="button"
-              onClick={copyLink}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-md border border-amber-line bg-amber-soft px-4 py-2.5 text-[13px] font-semibold text-amber-ink transition-colors hover:brightness-110"
-            >
-              <Link2 className="h-4 w-4" />
-              Copy shareable link
-            </button>
-          )}
+        {dirty && (
+          <button
+            type="button"
+            onClick={copyLink}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-md border border-amber-line bg-amber-soft px-4 py-2.5 text-[13px] font-semibold text-amber-ink transition-colors hover:brightness-110"
+          >
+            <Link2 className="h-4 w-4" />
+            Copy shareable link
+          </button>
+        )}
 
-          <div className="mt-5 flex gap-2.5 rounded-md border border-dashed border-line-2 px-3.5 py-3 text-[12.5px] leading-[1.45] text-ink-mute">
-            <span aria-hidden="true">✳</span>
-            <p>
-              <b className="font-semibold text-ink-dim">Nothing is saved.</b> The API feeds these
-              hypothetical results to the same pure engines behind the live tables and returns the
-              projection —{" "}
-              <code className="font-mono text-[12px] text-amber-ink">state is a projection</code>,
-              so a group result reshuffles the bracket for free — and the whole scenario lives in
-              the URL.
-            </p>
-          </div>
+        <div className="mt-5 flex gap-2.5 rounded-md border border-dashed border-line-2 px-3.5 py-3 text-[12.5px] leading-[1.45] text-ink-mute">
+          <span aria-hidden="true">✳</span>
+          <p>
+            <b className="font-semibold text-ink-dim">Nothing is saved.</b> The API feeds these
+            hypothetical results to the same pure engines behind the live tables and returns the
+            projection —{" "}
+            <code className="font-mono text-[12px] text-amber-ink">state is a projection</code>, so
+            a group result reshuffles the bracket for free — and the whole scenario lives in the
+            URL.
+          </p>
         </div>
       </div>
 
-      <div className="min-w-0 px-5 pt-2 pb-6 sm:px-6">
+      <div className="min-w-0 px-5 pt-2 pb-6 sm:px-6 lg:min-h-0 lg:overflow-y-auto">
         <CascadeTimeline steps={cascade} />
 
         <div className="mb-4 flex items-center justify-between gap-3">

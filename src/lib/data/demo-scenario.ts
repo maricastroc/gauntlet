@@ -1,6 +1,6 @@
 import { computeStandings, type RawMatch } from "@/lib/standings";
 import { resolveBracket, type TieResults } from "@/lib/knockout";
-import { roundName } from "@/lib/format";
+import { roundName, shortRound } from "@/lib/format";
 import type {
   Bracket,
   BracketTie,
@@ -121,6 +121,7 @@ export function demoWhatIfSetup(): WhatIfSetup {
       fixtures.push({
         id: groupMatchId(group.id, index),
         phase: "group",
+        phaseLabel: group.name,
         label: `Group ${group.name} · ${home.name} vs ${away.name}`,
         home,
         away,
@@ -139,6 +140,7 @@ export function demoWhatIfSetup(): WhatIfSetup {
     fixtures.push({
       id: tie.id,
       phase: "knockout",
+      phaseLabel: shortRound(tie.round, MAX_ROUND),
       label: `${roundName(tie.round, MAX_ROUND)} · ${home.name} vs ${away.name}`,
       home,
       away,

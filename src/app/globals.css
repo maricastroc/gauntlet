@@ -161,6 +161,19 @@
     color: var(--color-amber-ink);
   }
 
+  /* keep the field background/text ours through browser autofill */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--color-ink);
+    -webkit-box-shadow: 0 0 0 1000px var(--color-surface-2) inset;
+    box-shadow: 0 0 0 1000px var(--color-surface-2) inset;
+    caret-color: var(--color-ink);
+    /* defer WebKit's yellow wash effectively forever */
+    transition: background-color 100000s ease-in-out 0s;
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-amber);
     outline-offset: 2px;

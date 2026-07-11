@@ -1,5 +1,5 @@
 import { api, type ScenarioInput } from "@/lib/api/client";
-import { roundName, roundTag } from "@/lib/format";
+import { roundName, roundTag, shortRound } from "@/lib/format";
 import type {
   Bracket,
   ScenarioProjection,
@@ -109,6 +109,7 @@ async function liveWhatIfSetup(tournamentId: number): Promise<WhatIfSetup> {
           fixtures.push({
             id: fixture.id,
             phase: "group",
+            phaseLabel: group.name,
             label: `Group ${group.name} · ${enrichName(fixture.home).name} vs ${enrichName(fixture.away).name}`,
             home: enrichName(fixture.home),
             away: enrichName(fixture.away),
@@ -130,6 +131,7 @@ async function liveWhatIfSetup(tournamentId: number): Promise<WhatIfSetup> {
       fixtures.push({
         id: fixture.id,
         phase: "knockout",
+        phaseLabel: shortRound(round, maxRound),
         label: `${roundName(round, maxRound)} · ${enrichName(fixture.home).name} vs ${enrichName(fixture.away).name}`,
         home: enrichName(fixture.home),
         away: enrichName(fixture.away),

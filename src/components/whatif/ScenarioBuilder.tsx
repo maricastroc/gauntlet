@@ -1,8 +1,9 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import type { ScenarioResult, WhatIfFixture } from "@/lib/types";
-import { Select } from "@/components/ui/Select";
 import { Stepper } from "@/components/console/Stepper";
+import { Flag } from "@/components/ui/Flag";
 import { useScenarioEditor } from "./useScenarioEditor";
 import { ScenarioPins } from "./ScenarioPins";
 
@@ -14,9 +15,26 @@ interface ScenarioBuilderProps {
   onReset: () => void;
 }
 
+const phaseKeyOf = (fixture: WhatIfFixture) => `${fixture.phase}:${fixture.phaseLabel}`;
+
 export function ScenarioBuilder({ fixtures, pins, onPin, onUnpin, onReset }: ScenarioBuilderProps) {
   const editor = useScenarioEditor(fixtures, pins);
   const { selected, home, away, homePens, awayPens, shootout } = editor;
+
+  const phases = useMemo(() => {
+    const seen = new Set<string>();
+    const list: Array<{ key: string; label: string }> = [];
+    for (const fixture of fixtures) {
+      const key = phaseKeyOf(fixture);
+      if (!seen.has(key)) {
+        seen.add(key);
+        list.push({ key, label: fixture.phaseLabel });
+      }
+    }
+    return list;
+  }, [fixtures]);
+
+  const [phaseKey, setPhaseKey] = useState(selected ? phaseKeyOf(selected) : (phases[0]?.key ?? ""));
 
   if (!selected) {
     return (
@@ -26,23 +44,75 @@ export function ScenarioBuilder({ fixtures, pins, onPin, onUnpin, onReset }: Sce
     );
   }
 
+  const phaseFixtures = fixtures.filter((fixture) => phaseKeyOf(fixture) === phaseKey);
+
+  const selectPhase = (key: string) => {
+    setPhaseKey(key);
+    const first = fixtures.find((fixture) => phaseKeyOf(fixture) === key);
+    if (first) editor.reselect(first.id);
+  };
+
   return (
     <div>
       <span className="mb-2 block font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-mute">
         Pick a match
       </span>
-      <Select
-        value={String(selected.id)}
-        onValueChange={(next) => editor.reselect(Number(next))}
-        ariaLabel="Match"
-        triggerClassName="w-full"
-        items={fixtures.map((fixture) => ({
-          value: String(fixture.id),
-          label: `${fixture.label}${
-            fixture.status === "finished" ? ` (${fixture.homeScore}–${fixture.awayScore})` : ""
-          }`,
-        }))}
-      />
+
+      <div className="flex flex-wrap gap-1.5">
+        {phases.map((phase) => {
+          const active = phase.key === phaseKey;
+          return (
+            <button
+              key={phase.key}
+              type="button"
+              onClick={() => selectPhase(phase.key)}
+              className={[
+                "rounded-md border px-2.5 py-1 font-mono text-[11px] tracking-[0.05em] transition-colors",
+                active
+                  ? "border-amber bg-amber font-bold text-[#1a1205]"
+                  : "border-line-2 text-ink-dim hover:border-amber-line hover:text-ink",
+              ].join(" ")}
+            >
+              {phase.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-2.5 flex flex-col gap-1 rounded-md border border-line bg-surface p-1.5">
+        {phaseFixtures.map((fixture) => {
+          const isSelected = fixture.id === selected.id;
+          const pinned = pins.has(fixture.id);
+          return (
+            <button
+              key={fixture.id}
+              type="button"
+              onClick={() => editor.reselect(fixture.id)}
+              className={[
+                "flex items-center gap-2 rounded-[6px] px-2.5 py-1.5 text-left text-[13px] transition-colors",
+                isSelected ? "bg-amber-soft text-ink" : "text-ink-dim hover:bg-white/[0.03]",
+              ].join(" ")}
+            >
+              <span className="flex min-w-0 flex-1 items-center gap-1.5">
+                <Flag team={fixture.home} className="text-[14px]" />
+                <span className="truncate">{fixture.home.name}</span>
+                <span className="text-ink-mute">vs</span>
+                <Flag team={fixture.away} className="text-[14px]" />
+                <span className="truncate">{fixture.away.name}</span>
+              </span>
+              {pinned ? (
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber" aria-label="pinned" />
+              ) : (
+                fixture.status === "finished" && (
+                  <span className="shrink-0 font-mono text-[11px] text-ink-mute">
+                    {fixture.homeScore}–{fixture.awayScore}
+                  </span>
+                )
+              )}
+            </button>
+          );
+        })}
+      </div>
 
       <div className="mt-4 flex items-center justify-center gap-4 rounded-md border border-line bg-surface-2 p-5">
         <Side team={selected.home} value={home} onChange={editor.setHome} />
@@ -51,21 +121,23 @@ export function ScenarioBuilder({ fixtures, pins, onPin, onUnpin, onReset }: Sce
       </div>
 
       {shootout && (
-        <div className="mt-2 flex items-center justify-center gap-4 rounded-md border border-dashed border-line-2 px-5 py-3">
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-ink-mute">
+        <div className="mt-2 rounded-md border border-dashed border-line-2 px-4 py-3">
+          <div className="mb-2 text-center font-mono text-[10.5px] uppercase tracking-[0.1em] text-ink-mute">
             Penalties
-          </span>
-          <Stepper
-            value={homePens}
-            onChange={editor.setHomePens}
-            label={`${selected.home.name} penalties`}
-          />
-          <span className="font-mono text-[13px] text-ink-mute">×</span>
-          <Stepper
-            value={awayPens}
-            onChange={editor.setAwayPens}
-            label={`${selected.away.name} penalties`}
-          />
+          </div>
+          <div className="flex items-center justify-center gap-4">
+            <Stepper
+              value={homePens}
+              onChange={editor.setHomePens}
+              label={`${selected.home.name} penalties`}
+            />
+            <span className="font-mono text-[13px] text-ink-mute">×</span>
+            <Stepper
+              value={awayPens}
+              onChange={editor.setAwayPens}
+              label={`${selected.away.name} penalties`}
+            />
+          </div>
         </div>
       )}
 

@@ -31,7 +31,7 @@ export function AuthField({
         placeholder={placeholder}
         onChange={onChange}
         clearLabel={`Clear ${label.toLowerCase()}`}
-        className="rounded-[9px] border border-line-2 bg-surface-2 py-3 text-[15px] text-ink outline-none transition-colors duration-150 placeholder:text-ink-mute focus:border-amber-line"
+        className="rounded-[9px] border border-line-2 bg-surface-2 py-3 text-[15px] text-ink outline-none transition-all duration-200 placeholder:text-ink-mute focus:border-amber-line"
       />
     </label>
   );
