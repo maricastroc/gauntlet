@@ -7,6 +7,21 @@ export interface RawMatch {
   awayScore: number;
 }
 
+export type Criterion = "points" | "goalDifference" | "goalsFor" | "wins" | "headToHead";
+
+/**
+ * World Cup order: overall points, goal difference, goals for, then head-to-head
+ * among the still-tied teams, then wins. Teams level on everything keep seed order.
+ * Mirrors the backend `TiebreakRules::fifa()` so both engines rank identically.
+ */
+export const FIFA_TIEBREAK: Criterion[] = [
+  "points",
+  "goalDifference",
+  "goalsFor",
+  "headToHead",
+  "wins",
+];
+
 interface Tally {
   team: Team;
   played: number;
@@ -24,7 +39,28 @@ export function computeStandings(
   teams: Team[],
   matches: RawMatch[],
   qualifyCount: number,
+  criteria: Criterion[] = FIFA_TIEBREAK,
 ): StandingRow[] {
+  const ordered = order(accumulate(teams, matches), matches, criteria);
+
+  return ordered.map((tally, index) => ({
+    position: index + 1,
+    team: tally.team,
+    played: tally.played,
+    won: tally.won,
+    drawn: tally.drawn,
+    lost: tally.lost,
+    goalsFor: tally.goalsFor,
+    goalsAgainst: tally.goalsAgainst,
+    goalDifference: tally.goalsFor - tally.goalsAgainst,
+    points: tally.points,
+    form: tally.form,
+    qualified: index < qualifyCount,
+  }));
+}
+
+/** Folds matches into one tally per team. Reused for the head-to-head mini-tables. */
+function accumulate(teams: Team[], matches: RawMatch[]): Tally[] {
   const tallies = new Map<number, Tally>();
   teams.forEach((team, index) => {
     tallies.set(team.id, {
@@ -75,31 +111,87 @@ export function computeStandings(
     }
   }
 
-  const ordered = [...tallies.values()].sort(compareTallies);
-
-  return ordered.map((tally, index) => ({
-    position: index + 1,
-    team: tally.team,
-    played: tally.played,
-    won: tally.won,
-    drawn: tally.drawn,
-    lost: tally.lost,
-    goalsFor: tally.goalsFor,
-    goalsAgainst: tally.goalsAgainst,
-    goalDifference: tally.goalsFor - tally.goalsAgainst,
-    points: tally.points,
-    form: tally.form,
-    qualified: index < qualifyCount,
-  }));
+  return [...tallies.values()];
 }
 
-function compareTallies(a: Tally, b: Tally): number {
-  const gd = (t: Tally) => t.goalsFor - t.goalsAgainst;
-  return (
-    b.points - a.points ||
-    gd(b) - gd(a) ||
-    b.goalsFor - a.goalsFor ||
-    b.won - a.won ||
-    a.seed - b.seed
+/**
+ * Applies the tiebreak chain. A scalar criterion splits the teams into buckets of
+ * equal value; each bucket recurses with the remaining criteria. Head-to-head is
+ * special: it re-ranks the tied teams by a mini-table of only the games among them.
+ */
+function order(list: Tally[], matches: RawMatch[], criteria: Criterion[]): Tally[] {
+  if (list.length <= 1 || criteria.length === 0) return list;
+
+  const [criterion, ...rest] = criteria;
+
+  if (criterion === "headToHead") {
+    return resolveHeadToHead(list, matches, rest);
+  }
+
+  return bucketsByScalars(list, [criterion]).flatMap((bucket) =>
+    bucket.length === 1 ? bucket : order(bucket, matches, rest),
   );
+}
+
+/**
+ * Among the tied teams, build a mini-league from only the games between them and
+ * reorder by its points/goal difference/goals for. Teams still level fall through
+ * to the criteria that follow head-to-head.
+ */
+function resolveHeadToHead(tied: Tally[], matches: RawMatch[], rest: Criterion[]): Tally[] {
+  const ids = new Set(tied.map((t) => t.team.id));
+  const intra = matches.filter((m) => ids.has(m.homeId) && ids.has(m.awayId));
+  const mini = accumulate(
+    tied.map((t) => t.team),
+    intra,
+  );
+  const original = new Map(tied.map((t) => [t.team.id, t]));
+
+  return bucketsByScalars(mini, ["points", "goalDifference", "goalsFor"]).flatMap((bucket) => {
+    const group = bucket.map((m) => original.get(m.team.id)!);
+    return group.length === 1 ? group : order(group, matches, rest);
+  });
+}
+
+/** Groups teams into ordered buckets, each holding the teams equal on all given scalars. */
+function bucketsByScalars(list: Tally[], scalars: Criterion[]): Tally[][] {
+  const sorted = [...list].sort((a, b) => {
+    for (const scalar of scalars) {
+      const delta = value(b, scalar) - value(a, scalar);
+      if (delta !== 0) return delta;
+    }
+    return 0;
+  });
+
+  const buckets: Tally[][] = [];
+  let current: Tally[] = [];
+  let previousKey: string | null = null;
+
+  for (const tally of sorted) {
+    const key = scalars.map((s) => value(tally, s)).join("|");
+    if (previousKey !== null && key !== previousKey) {
+      buckets.push(current);
+      current = [];
+    }
+    current.push(tally);
+    previousKey = key;
+  }
+  if (current.length > 0) buckets.push(current);
+
+  return buckets;
+}
+
+function value(t: Tally, criterion: Criterion): number {
+  switch (criterion) {
+    case "points":
+      return t.points;
+    case "goalDifference":
+      return t.goalsFor - t.goalsAgainst;
+    case "goalsFor":
+      return t.goalsFor;
+    case "wins":
+      return t.won;
+    case "headToHead":
+      return 0;
+  }
 }

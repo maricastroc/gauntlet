@@ -86,4 +86,37 @@ describe("computeStandings", () => {
     const rows = computeStandings(teams, matches, 2);
     expect(rows.every((r) => r.played === 0)).toBe(true);
   });
+
+  it("breaks an all-scalars tie by the head-to-head result", () => {
+    // Brazil and Argentina end level on points, goal difference, goals for and wins;
+    // Argentina won the match between them, so it must rank above Brazil despite the
+    // lower seed. This is the case the old comparator got wrong (it fell to seed).
+    const matches: RawMatch[] = [
+      { homeId: 2, awayId: 1, homeScore: 1, awayScore: 0 }, // Argentina beats Brazil
+      { homeId: 1, awayId: 3, homeScore: 1, awayScore: 0 }, // Brazil beats France
+      { homeId: 2, awayId: 4, homeScore: 0, awayScore: 1 }, // Spain beats Argentina
+    ];
+    const rows = computeStandings(teams, matches, 2);
+    const argentina = rows.find((r) => r.team.id === 2)!;
+    const brazil = rows.find((r) => r.team.id === 1)!;
+
+    expect(argentina.points).toBe(brazil.points);
+    expect(argentina.goalDifference).toBe(brazil.goalDifference);
+    expect(argentina.goalsFor).toBe(brazil.goalsFor);
+    expect(argentina.position).toBeLessThan(brazil.position);
+    expect(argentina.qualified).toBe(true);
+    expect(brazil.qualified).toBe(false);
+  });
+
+  it("falls through to seed order when the head-to-head is a cycle", () => {
+    // Brazil > Argentina > France > Brazil: the three are level everywhere, including
+    // the head-to-head mini-league, so the tie resolves by seed order.
+    const matches: RawMatch[] = [
+      { homeId: 1, awayId: 2, homeScore: 1, awayScore: 0 },
+      { homeId: 2, awayId: 3, homeScore: 1, awayScore: 0 },
+      { homeId: 3, awayId: 1, homeScore: 1, awayScore: 0 },
+    ];
+    const rows = computeStandings(teams, matches, 2);
+    expect(rows.map((r) => r.team.id)).toEqual([1, 2, 3, 4]);
+  });
 });

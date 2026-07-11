@@ -161,19 +161,6 @@
     color: var(--color-amber-ink);
   }
 
-  /* keep the field background/text ours through browser autofill */
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active {
-    -webkit-text-fill-color: var(--color-ink);
-    -webkit-box-shadow: 0 0 0 1000px var(--color-surface-2) inset;
-    box-shadow: 0 0 0 1000px var(--color-surface-2) inset;
-    caret-color: var(--color-ink);
-    /* defer WebKit's yellow wash effectively forever */
-    transition: background-color 100000s ease-in-out 0s;
-  }
-
   :focus-visible {
     outline: 2px solid var(--color-amber);
     outline-offset: 2px;
@@ -229,4 +216,34 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+/* ============================================================================
+   Browser autofill — keep our dark field background and ink text.
+   Deliberately UNLAYERED (and !important) so it beats Tailwind's focus:shadow
+   utility, which otherwise replaces our masking box-shadow and lets the
+   browser's autofill wash show through. WebKit only exposes the field via
+   box-shadow, so we paint the fill with a huge inset shadow.
+   ========================================================================== */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--color-ink) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--color-surface-2) inset !important;
+  box-shadow: 0 0 0 1000px var(--color-surface-2) inset !important;
+  caret-color: var(--color-ink);
+  transition: background-color 100000s ease-in-out 0s;
+}
+
+/* focused + autofilled: keep the fill AND restore the amber focus ring */
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-ink) !important;
+  -webkit-box-shadow:
+    0 0 0 1000px var(--color-surface-2) inset,
+    0 0 0 3px var(--color-amber-soft) !important;
+  box-shadow:
+    0 0 0 1000px var(--color-surface-2) inset,
+    0 0 0 3px var(--color-amber-soft) !important;
+  caret-color: var(--color-ink);
+  transition: background-color 100000s ease-in-out 0s;
 }
