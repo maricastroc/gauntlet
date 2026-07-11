@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { distribute, groupOptions, isBracketValid } from "@/lib/tournament/draft";
+import { distribute, groupOptions, isBracketValid, qualifyOptions } from "@/lib/tournament/draft";
 import type { Team } from "@/lib/types";
 
 const makeTeams = (n: number): Team[] =>
@@ -51,5 +51,27 @@ describe("isBracketValid", () => {
   it("rejects two-per-group with an odd number of groups", () => {
     expect(isBracketValid(2, 2)).toBe(true);
     expect(isBracketValid(6, 2)).toBe(false);
+  });
+});
+
+describe("qualifyOptions", () => {
+  it("only offers qualify counts that close a bracket", () => {
+    expect(qualifyOptions(2)).toEqual([2, 4]);
+    expect(qualifyOptions(4)).toEqual([1, 2, 4]);
+    expect(qualifyOptions(8)).toEqual([1, 2]);
+  });
+
+  it("always leaves at least one valid choice", () => {
+    for (const groups of groupOptions(32)) {
+      expect(qualifyOptions(groups).length).toBeGreaterThan(0);
+    }
+  });
+
+  it("only returns counts that isBracketValid accepts", () => {
+    for (const groups of [2, 4, 8]) {
+      for (const q of qualifyOptions(groups)) {
+        expect(isBracketValid(groups, q)).toBe(true);
+      }
+    }
   });
 });

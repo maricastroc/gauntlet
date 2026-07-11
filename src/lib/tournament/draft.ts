@@ -58,3 +58,7 @@ export function isBracketValid(numGroups: number, qualifyCount: number): boolean
   if (qualifyCount === 2 && numGroups % 2 !== 0) return false;
   return true;
 }
+
+export function qualifyOptions(numGroups: number): number[] {
+  return [1, 2, 3, 4].filter((q) => isBracketValid(numGroups, q));
+}

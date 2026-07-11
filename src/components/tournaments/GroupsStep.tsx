@@ -14,7 +14,7 @@ import {
 } from "@dnd-kit/core";
 import { GripVertical } from "lucide-react";
 import type { Team } from "@/lib/types";
-import { distribute, groupOptions, GROUP_LETTERS } from "@/lib/tournament/draft";
+import { distribute, groupOptions, qualifyOptions, GROUP_LETTERS } from "@/lib/tournament/draft";
 import { Field, Segmented, StepCard, WizardButton } from "./wizard";
 
 interface GroupsStepProps {
@@ -23,9 +23,6 @@ interface GroupsStepProps {
   setNumGroups: (n: number) => void;
   qualifyCount: number;
   setQualifyCount: (n: number) => void;
-  withKnockout: boolean;
-  setWithKnockout: (on: boolean) => void;
-  bracketValid: boolean;
   busy: boolean;
   onSubmit: (groups: number[][]) => void;
 }
@@ -40,9 +37,6 @@ export function GroupsStep({
   setNumGroups,
   qualifyCount,
   setQualifyCount,
-  withKnockout,
-  setWithKnockout,
-  bracketValid,
   busy,
   onSubmit,
 }: GroupsStepProps) {
@@ -78,7 +72,11 @@ export function GroupsStep({
           />
         </Field>
         <Field label="Advance per group">
-          <Segmented options={[1, 2, 3, 4]} value={qualifyCount} onChange={setQualifyCount} />
+          <Segmented
+            options={qualifyOptions(numGroups)}
+            value={qualifyCount}
+            onChange={setQualifyCount}
+          />
         </Field>
       </div>
 
@@ -121,21 +119,9 @@ export function GroupsStep({
         Drag a team onto another to swap their spots
       </p>
 
-      <label className="mt-4 flex items-center gap-2.5 text-[13px] text-ink-dim">
-        <input
-          type="checkbox"
-          checked={withKnockout && bracketValid}
-          disabled={!bracketValid}
-          onChange={(e) => setWithKnockout(e.target.checked)}
-          className="h-4 w-4 accent-amber"
-        />
-        Also generate the knockout bracket
-        {!bracketValid && (
-          <span className="font-mono text-[10.5px] text-ink-mute">
-            (needs 4, 8 or 16 qualifiers)
-          </span>
-        )}
-      </label>
+      <p className="mt-4 text-[13px] text-ink-dim">
+        {numGroups * qualifyCount} teams advance — the knockout bracket is generated automatically.
+      </p>
 
       <WizardButton disabled={busy} onClick={() => onSubmit(groups)}>
         {busy ? "Generating…" : "Create tournament"}

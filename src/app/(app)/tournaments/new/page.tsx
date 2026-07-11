@@ -14,7 +14,7 @@ import { useAuth } from "@/lib/auth/context";
 import { setCurrentTournamentCookie } from "@/lib/tournament/select";
 import {
   groupOptions,
-  isBracketValid,
+  qualifyOptions,
   GROUP_LETTERS,
   SUGGESTED,
   type DraftTeam,
@@ -32,7 +32,6 @@ export default function NewTournamentPage() {
   const [created, setCreated] = useState<Team[]>([]);
   const [numGroups, setNumGroups] = useState(4);
   const [qualifyCount, setQualifyCount] = useState(2);
-  const [withKnockout, setWithKnockout] = useState(true);
   const [busy, setBusy] = useState(false);
 
   if (status !== "authed" || !token) {
@@ -53,7 +52,14 @@ export default function NewTournamentPage() {
   }
 
   const validCount = drafts.map((d) => d.name.trim()).filter(Boolean).length;
-  const bracketValid = isBracketValid(numGroups, qualifyCount);
+
+  function changeNumGroups(n: number) {
+    setNumGroups(n);
+    const options = qualifyOptions(n);
+    if (!options.includes(qualifyCount)) {
+      setQualifyCount(options.includes(2) ? 2 : options[0]);
+    }
+  }
 
   async function run<T>(fn: () => Promise<T>): Promise<T | undefined> {
     setBusy(true);
@@ -96,9 +102,7 @@ export default function NewTournamentPage() {
 
     const built = await run(async () => {
       await api.buildGroupStage(token!, tournamentId!, { qualifyCount, groups });
-      if (withKnockout && bracketValid) {
-        await api.buildKnockout(token!, tournamentId!);
-      }
+      await api.buildKnockout(token!, tournamentId!);
       return true;
     });
 
@@ -139,12 +143,9 @@ export default function NewTournamentPage() {
             key={numGroups}
             teams={created}
             numGroups={numGroups}
-            setNumGroups={setNumGroups}
+            setNumGroups={changeNumGroups}
             qualifyCount={qualifyCount}
             setQualifyCount={setQualifyCount}
-            withKnockout={withKnockout}
-            setWithKnockout={setWithKnockout}
-            bracketValid={bracketValid}
             busy={busy}
             onSubmit={generate}
           />

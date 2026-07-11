@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PageHeading } from "@/components/ui/PageHeading";
 import { PlayableBracket } from "@/components/bracket/PlayableBracket";
+import { GenerateBracket } from "@/components/bracket/GenerateBracket";
 import { BracketLegend } from "@/components/bracket/BracketLegend";
 import { TitleOdds } from "@/components/forecast/TitleOdds";
 import { getBracket, getGroups } from "@/lib/data";
@@ -54,9 +55,13 @@ export default async function BracketPage() {
         </>
       ) : (
         <div className="px-5 pt-3 sm:px-6">
-          <div className="rounded-[11px] border border-dashed border-line-2 px-6 py-12 text-center text-[14px] text-ink-mute">
-            No knockout bracket yet — generate it once the group stage is set.
-          </div>
+          {groups.length > 0 ? (
+            <GenerateBracket tournamentId={tournamentId} />
+          ) : (
+            <div className="rounded-[11px] border border-dashed border-line-2 px-6 py-12 text-center text-[14px] text-ink-mute">
+              No knockout bracket yet — set up the group stage first.
+            </div>
+          )}
         </div>
       )}
     </div>

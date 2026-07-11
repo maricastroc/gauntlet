@@ -56,7 +56,7 @@ export default async function StandingsPage() {
         <div className="px-5 pt-4 sm:px-6">
           <Link
             href="/console"
-            className="flex flex-wrap items-center justify-between gap-3 rounded-[11px] border border-amber-line bg-amber-soft px-4 py-3 text-[13.5px] text-amber-ink transition-colors duration-150 hover:brightness-110"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-line bg-amber-soft px-4 py-3 text-[13.5px] text-amber-ink transition-colors duration-150 hover:brightness-110"
           >
             <span className="flex items-center gap-2">
               <span aria-hidden="true">◆</span>
@@ -88,7 +88,7 @@ export default async function StandingsPage() {
         />
       ) : (
         <div className="px-5 pt-3 sm:px-6">
-          <div className="rounded-[11px] border border-dashed border-line-2 px-6 py-12 text-center text-[14px] text-ink-mute">
+          <div className="rounded-md border border-dashed border-line-2 px-6 py-12 text-center text-[14px] text-ink-mute">
             This tournament has no group stage yet.
           </div>
         </div>
