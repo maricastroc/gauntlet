@@ -64,8 +64,9 @@ export default function TournamentsPage() {
     }
   }
 
-  const hasDemo = tournaments.some((t) => t.id === DEMO_TOURNAMENT_ID);
-  const cards = hasDemo ? tournaments : [DEMO_CARD, ...tournaments];
+  // Show the read-only sample only as an entry point when you own nothing yet;
+  // once you have your own tournament, it's just clutter.
+  const cards = tournaments.length > 0 ? tournaments : [DEMO_CARD];
 
   return (
     <div className="pb-10">

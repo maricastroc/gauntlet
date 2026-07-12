@@ -465,6 +465,16 @@ export const api = {
     return toTournamentDetail(data);
   }),
 
+  /** The public demo tournament id (the read-only template), resolved live — never hard-coded. */
+  demoTemplateId: cache(async (): Promise<number | null> => {
+    try {
+      const { tournament_id } = await request<{ tournament_id: number | null }>("/demo/template");
+      return tournament_id ?? null;
+    } catch {
+      return null;
+    }
+  }),
+
   /**
    * The tournament detail fetched WITH the caller's token, so `canManage` reflects the
    * backend policy (owner, template read-only, …). Deliberately not `cache()`-wrapped:

@@ -36,12 +36,14 @@ export function FixtureRow({
   authed,
   onChange,
   decisive = false,
+  readOnly = false,
 }: {
   fixture: FixtureDetail;
   row: RowState;
   authed: boolean;
   onChange: (side: "home" | "away", value: number) => void;
   decisive?: boolean;
+  readOnly?: boolean;
 }) {
   const changed = row.home !== row.savedHome || row.away !== row.savedAway;
 
@@ -66,12 +68,14 @@ export function FixtureRow({
         value={row.home}
         onChange={(v) => onChange("home", v)}
         label={fixture.home?.name ?? "home"}
+        disabled={readOnly}
       />
       <span className="font-mono text-[12px] text-ink-mute">–</span>
       <MiniStepper
         value={row.away}
         onChange={(v) => onChange("away", v)}
         label={fixture.away?.name ?? "away"}
+        disabled={readOnly}
       />
 
       <span className="flex min-w-0 flex-1 items-center gap-2 text-[13.5px]">

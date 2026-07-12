@@ -9,7 +9,15 @@ import { useGroupOutlook } from "./useGroupOutlook";
 import { FixtureRow } from "./FixtureRow";
 import { ConsequenceTable } from "./ConsequenceTable";
 
-export function GroupEditor({ group, onSaved }: { group: GroupDetail; onSaved?: () => void }) {
+export function GroupEditor({
+  group,
+  onSaved,
+  readOnly = false,
+}: {
+  group: GroupDetail;
+  onSaved?: () => void;
+  readOnly?: boolean;
+}) {
   const editor = useGroupEditor(group);
 
   useEffect(() => {
@@ -73,6 +81,7 @@ export function GroupEditor({ group, onSaved }: { group: GroupDetail; onSaved?: 
               row={editor.rows[fixture.id]}
               authed={editor.authed}
               decisive={decisiveFor(fixture)}
+              readOnly={readOnly}
               onChange={(side, value) => editor.setScore(fixture.id, side, value)}
             />
           ))}

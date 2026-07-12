@@ -20,10 +20,12 @@ export function RoundEditor({
   label,
   ties,
   onSaved,
+  readOnly = false,
 }: {
   label: string;
   ties: BracketTie[];
   onSaved?: () => void;
+  readOnly?: boolean;
 }) {
   const editor = useTieEditor(ties);
 
@@ -61,6 +63,7 @@ export function RoundEditor({
               tie={tie}
               row={editor.rows[tie.id]}
               authed={editor.authed}
+              readOnly={readOnly}
               onScore={(side, value) => editor.setScore(tie.id, side, value)}
               onPenalty={(side, value) => editor.setPenalty(tie.id, side, value)}
             />

@@ -11,15 +11,12 @@ export async function getCurrentTournamentId(): Promise<number> {
   const raw = store.get(CURRENT_TOURNAMENT_COOKIE)?.value;
   const id = raw ? Number(raw) : Number.NaN;
 
-  if (!Number.isInteger(id) || id <= 0 || id === DEMO_TOURNAMENT_ID) {
-    return DEMO_TOURNAMENT_ID;
+  if (Number.isInteger(id) && id > 0 && (!LIVE_ENABLED || (await tournamentExists(id)))) {
+    return id;
   }
 
-  if (LIVE_ENABLED && !(await tournamentExists(id))) {
-    return DEMO_TOURNAMENT_ID;
-  }
-
-  return id;
+  // The default (no/invalid selection) is the live demo template, not a hard-coded id.
+  return (LIVE_ENABLED ? await api.demoTemplateId() : null) ?? DEMO_TOURNAMENT_ID;
 }
 
 async function tournamentExists(id: number): Promise<boolean> {

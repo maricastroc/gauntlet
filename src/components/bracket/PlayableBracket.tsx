@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 import { api } from "@/lib/api/client";
 import { notifyApiError } from "@/lib/toast";
 import { useAuth } from "@/lib/auth/context";
+import { useCanManage } from "@/lib/tournament/useCanManage";
+import { ReadOnlyBanner } from "@/components/ui/ReadOnlyBanner";
 import {
   childOf,
   resolveBracket,
@@ -21,9 +23,17 @@ import { MatchCard } from "./MatchCard";
 import { ChampionCard } from "./ChampionCard";
 import { TieEditor, type Consequence } from "./TieEditor";
 
-export function PlayableBracket({ initial }: { initial: BracketData }) {
+export function PlayableBracket({
+  initial,
+  tournamentId,
+}: {
+  initial: BracketData;
+  tournamentId: number;
+}) {
   const { status, token } = useAuth();
   const router = useRouter();
+  const canManage = useCanManage(tournamentId);
+  const readOnly = canManage === false;
   const authed = status === "authed" && token !== null;
 
   const base = useMemo(() => initial.ties, [initial.ties]);
@@ -112,6 +122,11 @@ export function PlayableBracket({ initial }: { initial: BracketData }) {
 
   return (
     <div>
+      {readOnly && (
+        <div className="px-5 pt-4 sm:px-6">
+          <ReadOnlyBanner />
+        </div>
+      )}
       {champion && (
         <div className="px-5 pt-4 sm:px-6">
           <div className="motion-safe:animate-trophy flex flex-wrap items-center justify-center gap-2 rounded-md border border-gold/45 bg-linear-to-b from-gold/[0.14] to-surface-2 px-4 py-3 text-center">
@@ -150,9 +165,9 @@ export function PlayableBracket({ initial }: { initial: BracketData }) {
         renderCard={(tie) => (
           <MatchCard
             tie={tie}
-            interactive
+            interactive={!readOnly}
             selected={tie.id === selectedId}
-            onSelect={() => setSelectedId(tie.id)}
+            onSelect={readOnly ? undefined : () => setSelectedId(tie.id)}
           />
         )}
         championSlot={<ChampionSlot champion={champion} />}

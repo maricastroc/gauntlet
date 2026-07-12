@@ -55,12 +55,14 @@ export function TieRow({
   authed,
   onScore,
   onPenalty,
+  readOnly = false,
 }: {
   tie: BracketTie;
   row: TieRowState | undefined;
   authed: boolean;
   onScore: (side: "home" | "away", value: number) => void;
   onPenalty: (side: "home" | "away", value: number) => void;
+  readOnly?: boolean;
 }) {
   if (!tieIsEditable(tie) || !row) {
     return <PlaceholderRow tie={tie} />;
@@ -90,12 +92,14 @@ export function TieRow({
           value={row.home}
           onChange={(v) => onScore("home", v)}
           label={tie.home.team?.name ?? "home"}
+          disabled={readOnly}
         />
         <span className="font-mono text-[12px] text-ink-mute">–</span>
         <MiniStepper
           value={row.away}
           onChange={(v) => onScore("away", v)}
           label={tie.away.team?.name ?? "away"}
+          disabled={readOnly}
         />
 
         <span className="flex min-w-0 flex-1 items-center gap-2 text-[13.5px]">
@@ -117,12 +121,14 @@ export function TieRow({
             value={row.homePen}
             onChange={(v) => onPenalty("home", v)}
             label={`${tie.home.team?.name ?? "home"} penalties`}
+            disabled={readOnly}
           />
           <span className="font-mono text-[12px] text-ink-mute">–</span>
           <MiniStepper
             value={row.awayPen}
             onChange={(v) => onPenalty("away", v)}
             label={`${tie.away.team?.name ?? "away"} penalties`}
+            disabled={readOnly}
           />
         </div>
       )}

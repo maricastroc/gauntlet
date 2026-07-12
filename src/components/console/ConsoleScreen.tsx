@@ -6,7 +6,9 @@ import { Lock } from "lucide-react";
 import type { Bracket, BracketTie, GroupDetail } from "@/lib/types";
 import { shortRound } from "@/lib/format";
 import { useAuth } from "@/lib/auth/context";
+import { useCanManage } from "@/lib/tournament/useCanManage";
 import { CascadeTimeline } from "@/components/whatif/CascadeTimeline";
+import { ReadOnlyBanner } from "@/components/ui/ReadOnlyBanner";
 import { GroupEditor } from "./GroupEditor";
 import { RoundEditor } from "./RoundEditor";
 import { useResultCascade } from "./useResultCascade";
@@ -136,6 +138,8 @@ export function ConsoleScreen({
 
   const { status, token } = useAuth();
   const authed = status === "authed" && token !== null;
+  const canManage = useCanManage(tournamentId);
+  const readOnly = canManage === false;
   const router = useRouter();
   const { steps, nonce, report, dismiss } = useResultCascade(tournamentId, authed);
 
@@ -164,6 +168,7 @@ export function ConsoleScreen({
 
   return (
     <div className="px-5 pt-2 sm:px-6">
+      {readOnly && <ReadOnlyBanner />}
       <CascadeTimeline
         key={nonce}
         steps={steps}
@@ -191,13 +196,19 @@ export function ConsoleScreen({
       </div>
 
       {selected.kind === "group" ? (
-        <GroupEditor key={selected.key} group={selected.group} onSaved={handleGroupSaved} />
+        <GroupEditor
+          key={selected.key}
+          group={selected.group}
+          onSaved={handleGroupSaved}
+          readOnly={readOnly}
+        />
       ) : (
         <RoundEditor
           key={selected.key}
           label={selected.label}
           ties={selected.ties}
           onSaved={handleRoundSaved}
+          readOnly={readOnly}
         />
       )}
     </div>

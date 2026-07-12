@@ -51,7 +51,7 @@ export default async function BracketPage() {
       {bracket.ties.length > 0 ? (
         <>
           <TitleOdds odds={titleOdds} />
-          <PlayableBracket initial={bracket} />
+          <PlayableBracket initial={bracket} tournamentId={tournamentId} />
         </>
       ) : (
         <div className="px-5 pt-3 sm:px-6">
