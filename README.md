@@ -18,6 +18,22 @@ champion. Typography does the heavy lifting — **Fraunces** (serif titles),
 re-mounts the screen for a gentle, reduced-motion-safe rise. The visual
 reference is the API's `docs/mocks/bracket-mocks.html`.
 
+## 🖼️ Screenshots
+
+<table>
+  <tr>
+    <td align="center" width="62%"><strong>Desktop</strong></td>
+    <td align="center" width="38%"><strong>Mobile</strong></td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/desktop-1.png" alt="Home — Desktop" /></td>
+    <td rowspan="2" valign="top"><img src="docs/mobile-1.png" alt="Home - Mobile" /></td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/desktop-2.png" alt="Home — Desktop" /></td>
+  </tr>
+</table>
+
 ## Screens
 
 | Route                      | Screen             | What it does                                                                                                                                               |
@@ -25,6 +41,7 @@ reference is the API's `docs/mocks/bracket-mocks.html`.
 | `/`                        | **Overview**       | Answers "what needs my attention now" — next decider, the tightest group, live stats.                                                                      |
 | `/standings`               | **Standings**      | Every group table — qualification zones, tiebreak notes, and a per-team forecast (clinched / out / % to advance).                                          |
 | `/bracket`                 | **Bracket**        | The signature screen — a _playable_ knockout (tap a tie, enter the score, the winner advances to the trophy) topped by a Monte-Carlo "title race".         |
+| `/live`                    | **Live**           | A public, read-only spectator board — standings, bracket and title odds on one page, updating on their own over SSE as results come in (no reload). In the nav, or via "Open live view" on Manage. |
 | `/console`                 | **Console**        | Edit a result; the projection previews the delta, then a real optimistic-locked write saves it.                                                            |
 | `/what-if`                 | **What if?**       | Pin hypothetical results and watch the standings — and the whole bracket — re-project; a shareable, zero-persistence scenario with a propagation timeline. |
 | `/tournaments`             | **Tournaments**    | Every tournament you run — open one to view it across the app, or delete it. A sample tournament is always shown.                                          |
@@ -54,6 +71,14 @@ reference is the API's `docs/mocks/bracket-mocks.html`.
   team **clinched**, **out**, or a live **% to advance**, from simulating each
   group's remaining games. A seeded RNG keeps the numbers stable until a real
   result moves them.
+- **Live spectator updates.** An organizer edits a result and every watcher sees it —
+  standings, bracket and title odds refresh on their own, no reload. The browser holds a
+  Server-Sent Events connection to the API (`GET /tournaments/{id}/stream`); on each committed
+  result the page refetches the authoritative snapshot (a coalesced `router.refresh()`), so
+  nothing goes stale and no business rule is duplicated on the client. A **`/live`** board (in the
+  nav, or "Open live view" on Manage) puts standings + bracket + odds on one read-only page, and a
+  status chip in the topbar shows **Live / Reconnecting** and flashes on each update. Dropped or
+  backgrounded tabs re-sync from the snapshot on reconnect — never from replayed events.
 - **The Console.** Pick a match, dial each side's score, and the group table on
   the right previews the exact reorder — rows _animate_ into their new place, each
   team tagged mathematically **through** or **out**, and the games that still decide
@@ -98,10 +123,11 @@ reference is the API's `docs/mocks/bracket-mocks.html`.
 
 ```
 src/
-  app/(app)/…          route group; shared shell (rail + topbar + phase pills)
+  app/(app)/…          route group; shared shell (rail + topbar + phase pills + live SSE subscriber)
+    live/              public read-only spectator board (standings + bracket + odds)
     tournaments/       the tournament gallery + new/ (the build wizard)
   app/login/ register/ organizer auth
-  components/          shell · bracket · standings · overview · console · forecast · tournaments · ui
+  components/          shell · bracket · standings · overview · console · forecast · live · tournaments · ui
   lib/
     types.ts           UI domain model
     format.ts          round names, ordinals, goal-difference display
@@ -110,6 +136,7 @@ src/
     console.ts         console preview helpers (raw matches → standings delta)
     forecast/          Monte-Carlo odds — seeded RNG, model, group + bracket sims
     whatif/            scenario URL codec + cascade (diff → propagation narrative)
+    live/              SSE sync — stream-event reducer (dedup / order guard) + useLiveTournament (EventSource → coalesced router.refresh)
     hooks/             useScenario (pins → projection), useStandings, useRequest
     auth/              session context (token in localStorage, useAuth)
     api/client.ts      live API client (reads, auth, tournament CRUD, result + scenario)
@@ -152,14 +179,18 @@ Point it at the companion API (seeded):
 
 ```bash
 # in ../tournament-game-api
-php artisan migrate:fresh --seed     # demo organizer: demo@bracket.test / password
-php artisan serve                    # http://localhost:8000
+php artisan migrate:fresh --seed                        # demo organizer: demo@bracket.test / password
+PHP_CLI_SERVER_WORKERS=8 php artisan serve --no-reload  # http://localhost:8000
 
 # here
 npm install
 npm run dev      # http://localhost:3000
 npm run build
 ```
+
+> **The live view (SSE) needs the API served with concurrency:** `--no-reload` +
+> `PHP_CLI_SERVER_WORKERS` (both baked into the API's `composer dev`). Plain `php artisan serve` is
+> single-process, so a held stream — which every shell page now opens — would block it.
 
 ## Tooling
 
