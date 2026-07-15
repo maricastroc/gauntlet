@@ -1,13 +1,34 @@
-# Gauntlet
+<h1 align="center">
+  <br>
+  <img src="src/app/icon.svg" alt="Gauntlet" width="40">
+  <br>
+  Gauntlet
+  <br>
+</h1>
 
-**Gauntlet** — run the bracket, lift the cup. The operator UI for
-[`gauntlet-api`](https://github.com/maricastroc/gauntlet-api) — a premium
-tournament-management product. The thesis of the API is that **state is a
-projection, not a stored value**: standings, tiebreaks and knockout advancement
-are _derived_ from match results. This frontend makes that legible — you edit a
-score and watch the table reorder before it's saved.
+<h4 align="center">Run the bracket, lift the cup — the operator UI for a premium tournament-management product.</h4>
 
-Built with **Next.js 16 (App Router)**, **TypeScript**, **Tailwind v4**.
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+</p>
+
+<p align="center">
+  <a href="#design">Design</a> •
+  <a href="#features">Features</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#running">Running</a>
+</p>
+
+<p align="center">
+  The operator UI for <a href="https://github.com/maricastroc/gauntlet-api"><code>gauntlet-api</code></a>. The thesis of the API is that <strong>state is a projection, not a stored value</strong>: standings, tiebreaks and knockout advancement are <em>derived</em> from match results. This frontend makes that legible — you edit a score and watch the table reorder before it's saved. Built with Next.js 16 (App Router), TypeScript, Tailwind v4.
+</p>
+
+<p align="center">
+  <img src="docs/desktop-1.png" alt="Gauntlet" width="800" />
+</p>
 
 ## Design
 
