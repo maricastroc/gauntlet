@@ -23,7 +23,7 @@
 </p>
 
 <p align="center">
-  The operator UI for <a href="https://github.com/maricastroc/gauntlet-api"><code>gauntlet-api</code></a>. The thesis of the API is that <strong>state is a projection, not a stored value</strong>: standings, tiebreaks and knockout advancement are <em>derived</em> from match results. This frontend makes that legible — you edit a score and watch the table reorder before it's saved. Built with Next.js 16 (App Router), TypeScript, Tailwind v4.
+  The operator UI for <a href="https://github.com/maricastroc/gauntlet-api"><code>gauntlet-api</code></a>. The thesis of the API is that <strong>standings are a derived read-model, not stored state</strong>: standings, tiebreaks and knockout advancement are <em>recomputed</em> from match results (a CQRS read-model, not event sourcing — there is no event store). This frontend makes that legible — you edit a score and watch the table reorder <em>before</em> it's saved, because the client runs the same projection the server does. Built with Next.js 16 (App Router), TypeScript, Tailwind v4.
 </p>
 
 <p align="center">

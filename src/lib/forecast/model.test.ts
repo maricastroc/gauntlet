@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  calibrate,
+  LEAGUE_BASELINE,
   ratingsFromMatches,
   ratingsFromStandings,
   sampleScore,
@@ -58,6 +60,61 @@ describe("ratingsFromStandings", () => {
     const ratings = ratingsFromStandings(groups);
     expect(ratings.get(2)).toBe(0);
     expect(ratings.get(1)!).toBeGreaterThan(0);
+  });
+});
+
+describe("calibrate", () => {
+  const match = (homeScore: number, awayScore: number): RawMatch => ({
+    homeId: 1,
+    awayId: 2,
+    homeScore,
+    awayScore,
+  });
+
+  it("keeps the league fallback when the sample is too thin", () => {
+    expect(calibrate([match(2, 1)])).toEqual(LEAGUE_BASELINE);
+    expect(calibrate([])).toEqual(LEAGUE_BASELINE);
+  });
+
+  it("honours a caller-supplied fallback below the calibration threshold", () => {
+    const fallback = { baseGoals: 0.9, homeAdvantage: 0.3 };
+    expect(calibrate([match(1, 0)], fallback)).toEqual(fallback);
+  });
+
+  it("fits baseGoals to the observed mean goals per team", () => {
+    const matches = [match(2, 1), match(3, 0), match(1, 2), match(2, 1)];
+    const cal = calibrate(matches);
+    expect(cal.baseGoals).toBeCloseTo(1.5);
+  });
+
+  it("fits homeAdvantage to the observed home-minus-away goal delta", () => {
+    const matches = [match(2, 1), match(2, 0), match(1, 1), match(3, 2)];
+    expect(calibrate(matches).homeAdvantage).toBeCloseTo(0.6);
+  });
+
+  it("clamps a degenerate scoreless sample to sane bounds", () => {
+    const matches = [match(0, 0), match(0, 0), match(0, 0), match(0, 0)];
+    const cal = calibrate(matches);
+    expect(cal.baseGoals).toBe(0.5);
+    expect(cal.homeAdvantage).toBe(0);
+  });
+
+  it("makes the calibrated model score more when goals are abundant", () => {
+    const highScoring = Array.from({ length: 8 }, () => match(4, 3));
+    const cal = calibrate(highScoring);
+    const rng = mulberry32(7);
+    let total = 0;
+    for (let i = 0; i < 2000; i++) {
+      const [h, a] = sampleScore(rng, 0, 0, cal);
+      total += h + a;
+    }
+    const baselineRng = mulberry32(7);
+    let baselineTotal = 0;
+    for (let i = 0; i < 2000; i++) {
+      const [h, a] = sampleScore(baselineRng, 0, 0);
+      baselineTotal += h + a;
+    }
+    expect(total).toBeGreaterThan(baselineTotal);
   });
 });
 

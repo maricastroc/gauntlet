@@ -1,7 +1,7 @@
 import { computeStandings, type RawMatch } from "@/lib/standings";
 import type { QualificationOutlook, Team } from "@/lib/types";
 import { hashString, mulberry32 } from "./rng";
-import { ratingsFromMatches, sampleScore } from "./model";
+import { calibrate, ratingsFromMatches, sampleScore, type Calibration } from "./model";
 
 export interface GroupForecast {
   advanceProb: Map<number, number>;
@@ -14,12 +14,15 @@ export interface GroupSim {
   played: RawMatch[];
   remaining: Array<[number, number]>;
   qualifyCount: number;
+  /** Optional scoring calibration; when omitted it is fit from this group's played matches. */
+  calibration?: Calibration;
 }
 
 const RUNS = 4000;
 
 export function forecastGroup(group: GroupSim): GroupForecast {
   const ratings = ratingsFromMatches(group.teams, group.played);
+  const calibration = group.calibration ?? calibrate(group.played);
   const rng = mulberry32(hashString(group.key));
   const counts = new Map<number, number>();
   for (const team of group.teams) counts.set(team.id, 0);
@@ -30,6 +33,7 @@ export function forecastGroup(group: GroupSim): GroupForecast {
         rng,
         ratings.get(homeId) ?? 0,
         ratings.get(awayId) ?? 0,
+        calibration,
       );
       return { homeId, awayId, homeScore, awayScore };
     });

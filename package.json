@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "vectors": "UPDATE_VECTORS=1 vitest run src/lib/standings.fuzz.test.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
