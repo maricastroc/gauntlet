@@ -228,3 +228,15 @@ npm run format:check  # Prettier — verify, no writes
 ESLint and Prettier are kept in separate lanes: `eslint-config-prettier` turns
 off any stylistic rules that would fight the formatter, so `npm run lint` judges
 code quality and `npm run format` owns whitespace and indentation.
+
+---
+
+<br/>
+
+<div align="center">
+
+© 2025–2026 [**Mariana Castro**](https://marianacastro.dev) · [Live demo](https://gauntlet.marianacastro.dev/)
+
+⭐ If you like this project, give it a star on GitHub!
+
+</div>
