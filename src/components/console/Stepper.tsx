@@ -14,7 +14,12 @@ export function Stepper({
   const set = (next: number) => onChange(Math.max(0, Math.min(99, next)));
 
   return (
-    <div className="flex items-center gap-2">
+    <div
+      data-testid="stepper"
+      data-label={label}
+      data-value={value}
+      className="flex items-center gap-2"
+    >
       <button
         type="button"
         aria-label={`One fewer goal for ${label}`}

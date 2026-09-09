@@ -47,11 +47,7 @@ export function GroupEditor({
     const row = editor.rows[fixture.id];
     const changed = row && (row.home !== row.savedHome || row.away !== row.savedAway);
     if (row?.finished || changed) return false;
-    return matchDecidesQualification(
-      forecast?.outlook ?? null,
-      fixture.home?.id,
-      fixture.away?.id,
-    );
+    return matchDecidesQualification(forecast?.outlook ?? null, fixture.home?.id, fixture.away?.id);
   };
 
   return (

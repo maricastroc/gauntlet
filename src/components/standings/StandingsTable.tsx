@@ -21,7 +21,11 @@ function GoalDifference({ value }: { value: number }) {
 
 function Row({ row, qualified }: { row: StandingRow; qualified: boolean }) {
   return (
-    <tr className="group transition-colors duration-150 hover:bg-white/1.5">
+    <tr
+      data-testid="standings-row"
+      data-team={row.team.name}
+      className="group transition-colors duration-150 hover:bg-white/1.5"
+    >
       <td className="relative w-10 py-3 pl-4 text-left font-mono text-[13px]">
         {qualified && (
           <span className="absolute bottom-1.5 left-0.5 top-1.5 w-0.75 rounded-full bg-amber" />
@@ -54,7 +58,10 @@ function Row({ row, qualified }: { row: StandingRow; qualified: boolean }) {
         <GoalDifference value={row.goalDifference} />
       </td>
 
-      <td className="py-3 pl-4 text-right font-mono text-[15px] font-bold text-ink">
+      <td
+        data-testid="standings-points"
+        className="py-3 pl-4 text-right font-mono text-[15px] font-bold text-ink"
+      >
         {row.points}
       </td>
 

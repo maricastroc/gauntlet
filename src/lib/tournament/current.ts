@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { ApiError, api } from "@/lib/api/client";
 import { CURRENT_TOURNAMENT_COOKIE, DEMO_TOURNAMENT_ID } from "./constants";
+import { markLiveDegraded } from "@/lib/data/health";
 
 export { CURRENT_TOURNAMENT_COOKIE, DEMO_TOURNAMENT_ID } from "./constants";
 
@@ -15,7 +16,16 @@ export async function getCurrentTournamentId(): Promise<number> {
     return id;
   }
 
-  return (LIVE_ENABLED ? await api.demoTemplateId() : null) ?? DEMO_TOURNAMENT_ID;
+  return (LIVE_ENABLED ? await demoTemplateId() : null) ?? DEMO_TOURNAMENT_ID;
+}
+
+async function demoTemplateId(): Promise<number | null> {
+  try {
+    return await api.demoTemplateId();
+  } catch {
+    markLiveDegraded("demo template");
+    return null;
+  }
 }
 
 async function tournamentExists(id: number): Promise<boolean> {
@@ -24,6 +34,7 @@ async function tournamentExists(id: number): Promise<boolean> {
     return true;
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) return false;
+    markLiveDegraded("tournament lookup");
     return true;
   }
 }

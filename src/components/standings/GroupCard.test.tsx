@@ -54,9 +54,7 @@ describe("GroupCard", () => {
   it("renders every team in standings order", () => {
     render(<GroupCard group={GROUP} />);
     const names = screen.getAllByRole("cell").map((c) => c.textContent);
-    const order = ["Brazil", "Japan", "Morocco"].map((n) =>
-      names.findIndex((t) => t?.includes(n)),
-    );
+    const order = ["Brazil", "Japan", "Morocco"].map((n) => names.findIndex((t) => t?.includes(n)));
     expect(order).toEqual([...order].sort((a, b) => a - b));
     expect(order.every((i) => i >= 0)).toBe(true);
   });

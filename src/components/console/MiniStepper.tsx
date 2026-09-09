@@ -15,6 +15,9 @@ export function MiniStepper({
 }) {
   return (
     <div
+      data-testid="mini-stepper"
+      data-label={label}
+      data-value={value}
       className={`flex shrink-0 items-center overflow-hidden rounded-md border border-line-2 bg-surface-3 ${
         disabled ? "opacity-60" : ""
       }`}

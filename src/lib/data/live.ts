@@ -43,7 +43,6 @@ function knockoutStageOf(detail: TournamentDetail): StageDetail | undefined {
   return detail.stages.find((stage) => stage.type === "knockout");
 }
 
-/** Rounds the knockout will have, inferred from the group qualifiers, before it is built. */
 function projectedKnockoutRounds(detail: TournamentDetail): number {
   const stage = groupStageOf(detail);
   if (!stage) return 0;

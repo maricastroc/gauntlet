@@ -39,17 +39,6 @@ export function ratingsFromStandings(groups: Group[]): Map<number, number> {
   return ratings;
 }
 
-/**
- * Poisson scoring model. The two league-level constants below are fallbacks, not guesses:
- * they are the historical baselines for competitive football, and they are used *only* until
- * a tournament has played enough of its own matches to calibrate from (see `calibrate`).
- *
- *   baseGoals ≈ 1.35 — mean goals *per team* per match. Real competitions cluster around
- *     1.3–1.5 (≈ 2.6–2.9 goals/game split between the two sides).
- *   homeAdvantage ≈ 0.15 — the extra expected goals carried by the home side. Home advantage
- *     in football is small but well documented; here it is expressed as a goal delta added to
- *     the home team's scoring rate.
- */
 export interface Calibration {
   baseGoals: number;
   homeAdvantage: number;
@@ -57,15 +46,8 @@ export interface Calibration {
 
 export const LEAGUE_BASELINE: Calibration = { baseGoals: 1.35, homeAdvantage: 0.15 };
 
-/** Below this many matches the sample is too thin to fit — keep the league fallback. */
 const MIN_MATCHES_TO_CALIBRATE = 4;
 
-/**
- * Fit `baseGoals` / `homeAdvantage` to the matches actually played, so the simulation tracks
- * the real scoring environment instead of a hardcoded average (a low-scoring group is not
- * simulated as if it were high-scoring). Falls back to the league baseline — or a caller-supplied
- * one — when there isn't enough signal yet.
- */
 export function calibrate(
   matches: RawMatch[],
   fallback: Calibration = LEAGUE_BASELINE,
@@ -103,7 +85,6 @@ export function sampleScore(
   return [poisson(rng, lambdaHome), poisson(rng, lambdaAway)];
 }
 
-/** Logistic scale: a rating gap of ~0.9 goals is one e-fold of win odds. Tunes rating gap → win probability. */
 const RATING_LOGISTIC_SCALE = 0.9;
 
 export function winProbability(ratingA: number, ratingB: number): number {

@@ -11,12 +11,6 @@ import { getCurrentTournamentId } from "@/lib/tournament/current";
 export const metadata: Metadata = { title: "Live" };
 export const dynamic = "force-dynamic";
 
-/**
- * Public, read-only spectator dashboard: standings, bracket, and Monte Carlo title odds for the
- * current tournament, on one page. It renders no management controls (the bracket is forced into
- * spectator mode). Live updates come for free — the (app) shell's LiveTournamentProvider refetches
- * this page whenever the tournament's revision advances.
- */
 export default async function LivePage() {
   const tournamentId = await getCurrentTournamentId();
   const [standings, consoleGroups, bracket, groups] = await Promise.all([

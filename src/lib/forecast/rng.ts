@@ -1,4 +1,3 @@
-
 export type Rng = () => number;
 
 export function mulberry32(seed: number): Rng {

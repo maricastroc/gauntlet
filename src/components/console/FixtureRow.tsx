@@ -6,15 +6,7 @@ import { Flag } from "@/components/ui/Flag";
 import { MiniStepper } from "./MiniStepper";
 import type { RowState } from "./useGroupEditor";
 
-function Status({
-  row,
-  authed,
-  changed,
-}: {
-  row: RowState;
-  authed: boolean;
-  changed: boolean;
-}) {
+function Status({ row, authed, changed }: { row: RowState; authed: boolean; changed: boolean }) {
   if (!authed) {
     return changed ? <span className="text-amber-ink">unsaved</span> : null;
   }
@@ -49,6 +41,9 @@ export function FixtureRow({
 
   return (
     <div
+      data-testid="fixture-row"
+      data-fixture={fixture.id}
+      data-status={authed ? row.status : changed ? "unsaved" : "clean"}
       title={decisive ? "This match still decides who advances" : undefined}
       className={[
         "flex items-center gap-2.5 rounded-[10px] border px-2.5 py-2 transition-colors",

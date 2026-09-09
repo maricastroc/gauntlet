@@ -136,7 +136,9 @@ export function ManageScreen({ tournamentId }: { tournamentId: number }) {
                 onSave={async (changes) => {
                   const updated = await api.updateTeam(token!, tournamentId, team.id, changes);
                   setDetail((d) =>
-                    d ? { ...d, teams: d.teams.map((t) => (t.id === updated.id ? updated : t)) } : d,
+                    d
+                      ? { ...d, teams: d.teams.map((t) => (t.id === updated.id ? updated : t)) }
+                      : d,
                   );
                   notifySuccess(`${updated.name} updated.`);
                   router.refresh();
@@ -197,9 +199,7 @@ function NameEditor({
         onClick={() => setEditing(true)}
         className="group flex w-full items-center gap-3 text-left"
       >
-        <span className="title-serif min-w-0 flex-1 truncate text-[20px] text-ink">
-          {initial}
-        </span>
+        <span className="title-serif min-w-0 flex-1 truncate text-[20px] text-ink">{initial}</span>
         <RenameHint />
       </button>
     );

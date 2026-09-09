@@ -34,7 +34,9 @@ export function ScenarioBuilder({ fixtures, pins, onPin, onUnpin, onReset }: Sce
     return list;
   }, [fixtures]);
 
-  const [phaseKey, setPhaseKey] = useState(selected ? phaseKeyOf(selected) : (phases[0]?.key ?? ""));
+  const [phaseKey, setPhaseKey] = useState(
+    selected ? phaseKeyOf(selected) : (phases[0]?.key ?? ""),
+  );
 
   if (!selected) {
     return (
@@ -114,7 +116,10 @@ export function ScenarioBuilder({ fixtures, pins, onPin, onUnpin, onReset }: Sce
         })}
       </div>
 
-      <div className="mt-4 flex items-center justify-center gap-4 rounded-md border border-line bg-surface-2 p-5">
+      <div
+        data-testid="scenario-editor"
+        className="mt-4 flex items-center justify-center gap-4 rounded-md border border-line bg-surface-2 p-5"
+      >
         <Side team={selected.home} value={home} onChange={editor.setHome} />
         <span className="font-mono text-[14px] text-ink-mute">×</span>
         <Side team={selected.away} value={away} onChange={editor.setAway} />

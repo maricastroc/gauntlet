@@ -9,20 +9,11 @@ export type LiveStatus = "connecting" | "live" | "reconnecting" | "offline";
 
 export interface LiveTournamentState {
   status: LiveStatus;
-  /** Wall-clock ms of the last landed refresh — drives a brief "Updated" pulse. Null until first. */
   lastUpdateAt: number | null;
 }
 
-/** Coalesce a burst of frames (a cascade, rapid edits) into a single refetch. */
 const COALESCE_MS = 400;
 
-/**
- * Subscribes the current tab to a tournament's public SSE stream and refetches the authoritative
- * snapshot (router.refresh) whenever the revision advances. One connection per tournament; it tears
- * down and reopens when the id changes. EventSource reconnects on its own, and the server re-emits
- * the current revision on (re)connect, so a dropped or backgrounded tab re-syncs from the snapshot —
- * never from replayed events.
- */
 export function useLiveTournament(tournamentId: number | null): LiveTournamentState {
   const router = useRouter();
   const [status, setStatus] = useState<LiveStatus>("connecting");

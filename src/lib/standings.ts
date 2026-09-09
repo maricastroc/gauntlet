@@ -9,11 +9,6 @@ export interface RawMatch {
 
 export type Criterion = "points" | "goalDifference" | "goalsFor" | "wins" | "headToHead";
 
-/**
- * World Cup order: overall points, goal difference, goals for, then head-to-head
- * among the still-tied teams, then wins. Teams level on everything keep seed order.
- * Mirrors the backend `TiebreakRules::fifa()` so both engines rank identically.
- */
 export const FIFA_TIEBREAK: Criterion[] = [
   "points",
   "goalDifference",
@@ -59,7 +54,6 @@ export function computeStandings(
   }));
 }
 
-/** Folds matches into one tally per team. Reused for the head-to-head mini-tables. */
 function accumulate(teams: Team[], matches: RawMatch[]): Tally[] {
   const tallies = new Map<number, Tally>();
   teams.forEach((team, index) => {
@@ -114,11 +108,6 @@ function accumulate(teams: Team[], matches: RawMatch[]): Tally[] {
   return [...tallies.values()];
 }
 
-/**
- * Applies the tiebreak chain. A scalar criterion splits the teams into buckets of
- * equal value; each bucket recurses with the remaining criteria. Head-to-head is
- * special: it re-ranks the tied teams by a mini-table of only the games among them.
- */
 function order(list: Tally[], matches: RawMatch[], criteria: Criterion[]): Tally[] {
   if (list.length <= 1 || criteria.length === 0) return list;
 
@@ -133,11 +122,6 @@ function order(list: Tally[], matches: RawMatch[], criteria: Criterion[]): Tally
   );
 }
 
-/**
- * Among the tied teams, build a mini-league from only the games between them and
- * reorder by its points/goal difference/goals for. Teams still level fall through
- * to the criteria that follow head-to-head.
- */
 function resolveHeadToHead(tied: Tally[], matches: RawMatch[], rest: Criterion[]): Tally[] {
   const ids = new Set(tied.map((t) => t.team.id));
   const intra = matches.filter((m) => ids.has(m.homeId) && ids.has(m.awayId));
@@ -153,7 +137,6 @@ function resolveHeadToHead(tied: Tally[], matches: RawMatch[], rest: Criterion[]
   });
 }
 
-/** Groups teams into ordered buckets, each holding the teams equal on all given scalars. */
 function bucketsByScalars(list: Tally[], scalars: Criterion[]): Tally[][] {
   const sorted = [...list].sort((a, b) => {
     for (const scalar of scalars) {

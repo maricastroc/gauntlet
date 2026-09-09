@@ -10,11 +10,7 @@ const tie = (id: number, round: number, slot: number): TieTopology => ({
   awaySource: "",
 });
 
-const fixture = (
-  id: number,
-  tieId: number,
-  status: FixtureDetail["status"],
-): FixtureDetail => ({
+const fixture = (id: number, tieId: number, status: FixtureDetail["status"]): FixtureDetail => ({
   id,
   tieId,
   home: null,

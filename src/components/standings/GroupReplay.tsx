@@ -72,7 +72,12 @@ export function GroupReplay({
           ◆ Replay · match {step} / {matches.length}
         </span>
         <div className="flex items-center gap-1.5">
-          <button type="button" aria-label={playing ? "Pause" : "Play"} onClick={togglePlay} className={iconButton}>
+          <button
+            type="button"
+            aria-label={playing ? "Pause" : "Play"}
+            onClick={togglePlay}
+            className={iconButton}
+          >
             {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
           </button>
           <button

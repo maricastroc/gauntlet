@@ -100,7 +100,10 @@ export default function RegisterPage() {
           />
           <span>
             Start with a sample tournament
-            <span className="text-ink-mute"> — a prefilled Atlas Cup 2026, yours to explore and edit.</span>
+            <span className="text-ink-mute">
+              {" "}
+              — a prefilled Atlas Cup 2026, yours to explore and edit.
+            </span>
           </span>
         </label>
 

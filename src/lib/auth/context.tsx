@@ -11,7 +11,12 @@ interface AuthValue {
   user: AuthUser | null;
   token: string | null;
   login: (email: string, password: string) => Promise<AuthUser>;
-  register: (name: string, email: string, password: string, seedSample: boolean) => Promise<AuthUser>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    seedSample: boolean,
+  ) => Promise<AuthUser>;
   logout: () => Promise<void>;
 }
 

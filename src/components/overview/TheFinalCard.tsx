@@ -5,13 +5,17 @@ function FinalRow({ side, won }: { side: TieSide; won: boolean }) {
   return (
     <div className="flex items-center gap-2.5 py-1.5">
       {side.team && <Flag team={side.team} className="text-[18px]" />}
-      <span className={`flex-1 truncate text-[15px] ${won ? "font-semibold text-ink" : "text-ink-dim"}`}>
+      <span
+        className={`flex-1 truncate text-[15px] ${won ? "font-semibold text-ink" : "text-ink-dim"}`}
+      >
         {side.team?.name ?? side.placeholder ?? "—"}
       </span>
       {won && <span aria-hidden="true">🏆</span>}
       <span className={`font-mono text-[15px] tabular-nums ${won ? "text-gold" : "text-ink-dim"}`}>
         {side.score ?? 0}
-        {side.penalties != null && <span className="ml-1 text-[11px] text-ink-mute">({side.penalties})</span>}
+        {side.penalties != null && (
+          <span className="ml-1 text-[11px] text-ink-mute">({side.penalties})</span>
+        )}
       </span>
     </div>
   );

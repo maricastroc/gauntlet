@@ -4,10 +4,6 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/context";
 
-/**
- * Whether the signed-in user may edit this tournament, per the backend policy.
- * `null` while unknown (loading or signed out) so callers can hold off on gating.
- */
 export function useCanManage(tournamentId: number): boolean | null {
   const { status, token } = useAuth();
   const [fetched, setFetched] = useState<boolean | null>(null);

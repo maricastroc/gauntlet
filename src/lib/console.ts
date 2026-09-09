@@ -56,11 +56,6 @@ export function describeMove(base: StandingRow | undefined, next: StandingRow): 
   return { dir: "none", text: `held ${ordinal(next.position)}` };
 }
 
-/**
- * A not-yet-played match still decides qualification if at least one team's fate is
- * open. If both are already settled (clinched or eliminated), it is a dead rubber:
- * its result cannot change who advances.
- */
 export function matchDecidesQualification(
   outlook: Map<number, QualificationOutlook> | null,
   homeId: number | undefined,

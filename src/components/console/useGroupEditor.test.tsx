@@ -106,6 +106,26 @@ describe("useGroupEditor", () => {
     expect(ids(result.current.preview)).toEqual([2, 1, 3]);
   });
 
+  it("saves an edit made while the session was still being restored", async () => {
+    submitGroupResult.mockResolvedValueOnce([]);
+    authRef.current = { status: "loading", token: null };
+    const { result, rerender } = renderHook(() => useGroupEditor(GROUP));
+
+    act(() => result.current.setScore(20, "away", 3));
+    expect(submitGroupResult).not.toHaveBeenCalled();
+
+    authRef.current = { status: "authed", token: "tok-1" };
+    act(() => rerender());
+
+    await waitFor(() => expect(submitGroupResult).toHaveBeenCalledTimes(1), { timeout: 2000 });
+    expect(submitGroupResult).toHaveBeenCalledWith("tok-1", 20, {
+      home_score: 0,
+      away_score: 3,
+      expected_version: 5,
+    });
+    await waitFor(() => expect(result.current.rows[20].status).toBe("saved"));
+  });
+
   it("still previews for an unauthenticated viewer but never writes", async () => {
     authRef.current = { status: "anon", token: null };
     const { result } = renderHook(() => useGroupEditor(GROUP));

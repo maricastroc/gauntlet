@@ -9,7 +9,6 @@ import { api } from "@/lib/api/client";
 import { setCurrentTournamentCookie } from "@/lib/tournament/select";
 import { notifyApiError, notifySuccess } from "@/lib/toast";
 
-/** Demo-only control: your edits are private to this session; reset restores a clean copy. */
 export function DemoReset() {
   const { user, token } = useAuth();
   const router = useRouter();

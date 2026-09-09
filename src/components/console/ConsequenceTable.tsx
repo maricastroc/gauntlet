@@ -39,6 +39,9 @@ export function ConsequenceTable({
             <div
               key={row.team.id}
               ref={flip(row.team.id)}
+              data-testid="consequence-row"
+              data-team={row.team.name}
+              data-position={row.position}
               className={[
                 "grid grid-cols-[26px_1fr_auto_auto] items-center gap-3 border-t border-t-line border-l-2 px-4 py-3 tabular-nums first:border-t-0",
                 row.qualified ? "border-l-amber" : "border-l-transparent",

@@ -161,7 +161,11 @@ function collectPlayed(groupFixtures: FixtureDetail[], bracket: Bracket): Played
   return [...fromGroups, ...fromTies];
 }
 
-function superlatives(groups: Group[], bracket: Bracket, groupFixtures: FixtureDetail[]): Superlative[] {
+function superlatives(
+  groups: Group[],
+  bracket: Bracket,
+  groupFixtures: FixtureDetail[],
+): Superlative[] {
   const out: Superlative[] = [];
   const rows = groups.flatMap((group) => group.standings).filter((row) => row.played > 0);
 
@@ -190,19 +194,20 @@ function superlatives(groups: Group[], bracket: Bracket, groupFixtures: FixtureD
   }
 
   const teamByName = new Map(rows.map((row) => [row.team.name, row.team] as const));
-  const biggest = collectPlayed(groupFixtures, bracket).reduce<{ margin: number; text: string; winner: string } | null>(
-    (best, match) => {
-      const margin = Math.abs(match.homeScore - match.awayScore);
-      if (margin === 0 || (best && margin <= best.margin)) return best;
-      const homeWon = match.homeScore > match.awayScore;
-      const winner = homeWon ? match.home : match.away;
-      const loser = homeWon ? match.away : match.home;
-      const hi = Math.max(match.homeScore, match.awayScore);
-      const lo = Math.min(match.homeScore, match.awayScore);
-      return { margin, winner, text: `${hi}–${lo} vs ${loser}` };
-    },
-    null,
-  );
+  const biggest = collectPlayed(groupFixtures, bracket).reduce<{
+    margin: number;
+    text: string;
+    winner: string;
+  } | null>((best, match) => {
+    const margin = Math.abs(match.homeScore - match.awayScore);
+    if (margin === 0 || (best && margin <= best.margin)) return best;
+    const homeWon = match.homeScore > match.awayScore;
+    const winner = homeWon ? match.home : match.away;
+    const loser = homeWon ? match.away : match.home;
+    const hi = Math.max(match.homeScore, match.awayScore);
+    const lo = Math.min(match.homeScore, match.awayScore);
+    return { margin, winner, text: `${hi}–${lo} vs ${loser}` };
+  }, null);
   const biggestTeam = biggest && teamByName.get(biggest.winner);
   if (biggest && biggestTeam) {
     out.push({ label: "Biggest win", team: biggestTeam, detail: biggest.text });

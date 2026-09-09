@@ -71,6 +71,9 @@ export function ProjectedStandings({ projection, baseline }: ProjectedStandingsP
                 return (
                   <div
                     key={row.team.id}
+                    data-testid="projected-row"
+                    data-team={row.team.name}
+                    data-position={row.position}
                     className={[
                       "grid grid-cols-[22px_1fr_auto_auto] items-center gap-3 border-t border-line px-3.5 py-2.5 tabular-nums first:border-t-0",
                       move.dir === "up" && "bg-win/5",

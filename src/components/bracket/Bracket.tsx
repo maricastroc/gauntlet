@@ -43,7 +43,13 @@ function RoundColumn({
       <RoundHeader>{roundName(round, maxRound)}</RoundHeader>
       <div className="flex flex-1 flex-col">
         {matches.map((tie) => (
-          <div key={tie.id} className="flex flex-1 items-center py-2">
+          <div
+            key={tie.id}
+            data-testid="bracket-tie"
+            data-round={round}
+            data-slot={tie.slot}
+            className="flex flex-1 items-center py-2"
+          >
             <div
               className={`w-full rounded-[12px] transition-all duration-200 ${
                 road

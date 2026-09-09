@@ -13,7 +13,9 @@ describe("matchDecidesQualification", () => {
   });
 
   it("is a dead rubber when both teams are already settled", () => {
-    expect(matchDecidesQualification(outlook({ 1: "clinched", 2: "eliminated" }), 1, 2)).toBe(false);
+    expect(matchDecidesQualification(outlook({ 1: "clinched", 2: "eliminated" }), 1, 2)).toBe(
+      false,
+    );
     expect(matchDecidesQualification(outlook({ 1: "clinched", 2: "clinched" }), 1, 2)).toBe(false);
   });
 

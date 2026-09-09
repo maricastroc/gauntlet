@@ -1,60 +1,43 @@
 @import "tailwindcss";
 
-/* react-tooltip, aligned to the design tokens */
 :root:root {
   --rt-color-dark: var(--color-surface-2);
   --rt-color-white: var(--color-ink-dim);
   --rt-opacity: 1;
 }
 
-/* ============================================================================
-   Bracket — design system
-   Ground truth: docs/mocks/bracket-mocks.html (the high-fidelity reference).
-   "Tinta de estádio à noite" — a chosen dark, blue-green biased, never black.
-   One accent (sodium-lamp amber). Color only where it carries meaning.
-   ========================================================================== */
-
 @theme {
-  /* ---- ground & surfaces ---- */
   --color-ground: #0e1518;
   --color-surface: #141e22;
   --color-surface-2: #1b272c;
   --color-surface-3: #223138;
 
-  /* ---- hairlines (borders instead of boxes) ---- */
   --color-line: rgba(230, 238, 235, 0.09);
   --color-line-2: rgba(230, 238, 235, 0.16);
 
-  /* ---- ink (neutral text scale) ---- */
   --color-ink: #eaf0ee;
   --color-ink-dim: #aebab7;
   --color-ink-mute: #6e7c79;
 
-  /* ---- amber: the single accent ---- */
   --color-amber: #f2a93b;
   --color-amber-ink: #ffc978;
   --color-amber-soft: rgba(242, 169, 59, 0.13);
   --color-amber-line: rgba(242, 169, 59, 0.38);
 
-  /* ---- gold: reserved for the trophy / champion ---- */
   --color-gold: #e7c66a;
 
-  /* ---- semantics: only result chips, kept apart from the accent ---- */
   --color-win: #55b87e;
   --color-draw: #7c8a87;
   --color-loss: #e06b62;
 
-  /* ---- type ---- */
   --font-serif: var(--font-fraunces), "Iowan Old Style", Palatino, Georgia, serif;
   --font-sans: var(--font-geist), -apple-system, system-ui, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* ---- radii ---- */
   --radius-lg: 16px;
   --radius-md: 11px;
   --radius-sm: 7px;
 
-  /* ---- motion (150–250ms, gentle) ---- */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 
   --animate-pulse-live: pulse-live 1.8s infinite;
@@ -122,10 +105,6 @@
   }
 }
 
-/* ============================================================================
-   Base
-   ========================================================================== */
-
 @layer base {
   html {
     color-scheme: dark;
@@ -137,7 +116,6 @@
   }
 
   body {
-    /* two stadium light-pools + the ground, exactly as the mock */
     background:
       radial-gradient(1200px 520px at 50% -8%, rgba(242, 169, 59, 0.07), transparent 60%),
       radial-gradient(900px 600px at 85% 10%, rgba(45, 96, 104, 0.16), transparent 55%),
@@ -150,7 +128,6 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* tabular figures everywhere mono is used — scores must not jitter */
   .font-mono {
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1;
@@ -167,7 +144,6 @@
     border-radius: 3px;
   }
 
-  /* quiet, premium scrollbars */
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--color-line-2) transparent;
@@ -185,12 +161,7 @@
   }
 }
 
-/* ============================================================================
-   A few semantic helpers reused across screens
-   ========================================================================== */
-
 @layer components {
-  /* the mono eyebrow/label used all over the mock */
   .eyebrow {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -199,7 +170,6 @@
     color: var(--color-ink-mute);
   }
 
-  /* elegant serif page/section titles */
   .title-serif {
     font-family: var(--font-serif);
     font-weight: 600;
@@ -218,13 +188,6 @@
   }
 }
 
-/* ============================================================================
-   Browser autofill — keep our dark field background and ink text.
-   Deliberately UNLAYERED (and !important) so it beats Tailwind's focus:shadow
-   utility, which otherwise replaces our masking box-shadow and lets the
-   browser's autofill wash show through. WebKit only exposes the field via
-   box-shadow, so we paint the fill with a huge inset shadow.
-   ========================================================================== */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:active {
@@ -235,7 +198,6 @@ input:-webkit-autofill:active {
   transition: background-color 100000s ease-in-out 0s;
 }
 
-/* focused + autofilled: keep the fill AND restore the amber focus ring */
 input:-webkit-autofill:focus {
   -webkit-text-fill-color: var(--color-ink) !important;
   -webkit-box-shadow:

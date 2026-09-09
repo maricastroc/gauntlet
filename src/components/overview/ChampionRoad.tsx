@@ -26,7 +26,9 @@ export function ChampionRoad({ champion, road }: { champion: Team; road: RoadSte
               <Flag team={step.opponent} className="text-[16px]" />
               <span className="truncate">{step.opponent.name}</span>
             </span>
-            <span className="shrink-0 font-mono text-[14px] tabular-nums text-win">{step.score}</span>
+            <span className="shrink-0 font-mono text-[14px] tabular-nums text-win">
+              {step.score}
+            </span>
           </li>
         ))}
       </ol>

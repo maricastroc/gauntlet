@@ -168,7 +168,13 @@ describe("buildRecap", () => {
     qualified: false,
   });
 
-  const playedFixture = (id: number, home: Team, away: Team, hs: number, as: number): FixtureDetail => ({
+  const playedFixture = (
+    id: number,
+    home: Team,
+    away: Team,
+    hs: number,
+    as: number,
+  ): FixtureDetail => ({
     id,
     tieId: null,
     home,

@@ -84,8 +84,8 @@ export function RoundEditor({
           <p className="mt-3 flex items-start gap-2 rounded-md border border-dashed border-line-2 px-3.5 py-2.5 text-[12px] leading-[1.45] text-ink-mute">
             <span aria-hidden="true">⛓</span>
             <span>
-              A level tie is settled on <b className="font-semibold text-ink-dim">penalties</b>. Each
-              result saves on its own and the winner advances{" "}
+              A level tie is settled on <b className="font-semibold text-ink-dim">penalties</b>.
+              Each result saves on its own and the winner advances{" "}
               <b className="font-semibold text-ink-dim">automatically</b>.
             </span>
           </p>

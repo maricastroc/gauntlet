@@ -27,7 +27,7 @@
 </p>
 
 <p align="center">
-  🔗 <strong>Live demo:</strong> <a href="gauntlet.marianacastro.dev/">gauntlet.marianacastro.dev</a>
+  🔗 <strong>Live demo:</strong> <a href="https://gauntlet.marianacastro.dev/">gauntlet.marianacastro.dev</a>
 </p>
 
 <p align="center">
@@ -61,18 +61,18 @@ reference is the API's `docs/mocks/bracket-mocks.html`.
 
 ## Screens
 
-| Route                      | Screen             | What it does                                                                                                                                               |
-| -------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`                        | **Overview**       | Answers "what needs my attention now" — next decider, the tightest group, live stats.                                                                      |
-| `/standings`               | **Standings**      | Every group table — qualification zones, tiebreak notes, and a per-team forecast (clinched / out / % to advance).                                          |
-| `/bracket`                 | **Bracket**        | The signature screen — a _playable_ knockout (tap a tie, enter the score, the winner advances to the trophy) topped by a Monte-Carlo "title race".         |
+| Route                      | Screen             | What it does                                                                                                                                                                                       |
+| -------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                        | **Overview**       | Answers "what needs my attention now" — next decider, the tightest group, live stats.                                                                                                              |
+| `/standings`               | **Standings**      | Every group table — qualification zones, tiebreak notes, and a per-team forecast (clinched / out / % to advance).                                                                                  |
+| `/bracket`                 | **Bracket**        | The signature screen — a _playable_ knockout (tap a tie, enter the score, the winner advances to the trophy) topped by a Monte-Carlo "title race".                                                 |
 | `/live`                    | **Live**           | A public, read-only spectator board — standings, bracket and title odds on one page, updating on their own over SSE as results come in (no reload). In the nav, or via "Open live view" on Manage. |
-| `/console`                 | **Console**        | Edit a result; the projection previews the delta, then a real optimistic-locked write saves it.                                                            |
-| `/what-if`                 | **What if?**       | Pin hypothetical results and watch the standings — and the whole bracket — re-project; a shareable, zero-persistence scenario with a propagation timeline. |
-| `/tournaments`             | **Tournaments**    | Every tournament you run — open one to view it across the app, or delete it. A sample tournament is always shown.                                          |
-| `/tournaments/new`         | **New tournament** | A three-step wizard — name it, add teams, split into groups — that generates the fixtures and the bracket.                                                 |
-| `/tournaments/[id]/manage` | **Manage**         | Rename the tournament and its teams after creation — safe edits; results, standings and the bracket are keyed by id, so they stay intact.                  |
-| `/login`·`/register`       | **Auth**           | Organizer sign-in / sign-up (Sanctum token). Reading is public; signing in unlocks the console and tournament management, and only the owner can save.     |
+| `/console`                 | **Console**        | Edit a result; the projection previews the delta, then a real optimistic-locked write saves it.                                                                                                    |
+| `/what-if`                 | **What if?**       | Pin hypothetical results and watch the standings — and the whole bracket — re-project; a shareable, zero-persistence scenario with a propagation timeline.                                         |
+| `/tournaments`             | **Tournaments**    | Every tournament you run — open one to view it across the app, or delete it. A sample tournament is always shown.                                                                                  |
+| `/tournaments/new`         | **New tournament** | A three-step wizard — name it, add teams, split into groups — that generates the fixtures and the bracket.                                                                                         |
+| `/tournaments/[id]/manage` | **Manage**         | Rename the tournament and its teams after creation — safe edits; results, standings and the bracket are keyed by id, so they stay intact.                                                          |
+| `/login`·`/register`       | **Auth**           | Organizer sign-in / sign-up (Sanctum token). Reading is public; signing in unlocks the console and tournament management, and only the owner can save.                                             |
 
 ## Features
 
@@ -198,12 +198,18 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api   # default
 NEXT_PUBLIC_USE_LIVE_API=true                         # set "false" to force demo
 ```
 
+When the live API can't be reached, the data layer falls back to the bundled
+sample tournament rather than erroring — and says so: the shell renders a
+`Live data unavailable` banner, so a degraded read is never mistaken for a real
+standing. Anything the fallback can't rescue lands on a proper error boundary
+(`app/error.tsx`, `app/(app)/error.tsx`) instead of Next's default screen.
+
 ## Running
 
 Point it at the companion API (seeded):
 
 ```bash
-# in ../tournament-game-api
+# in ../gauntlet-api
 php artisan migrate:fresh --seed                        # demo organizer: demo@bracket.test / password
 PHP_CLI_SERVER_WORKERS=8 php artisan serve --no-reload  # http://localhost:8000
 
@@ -216,6 +222,40 @@ npm run build
 > **The live view (SSE) needs the API served with concurrency:** `--no-reload` +
 > `PHP_CLI_SERVER_WORKERS` (both baked into the API's `composer dev`). Plain `php artisan serve` is
 > single-process, so a held stream — which every shell page now opens — would block it.
+
+## Testing
+
+```bash
+npm run test          # Vitest — the engine, the forecasts, the hooks
+npm run test:e2e      # Playwright — the browser, against a real API
+npm run test:e2e:ui   # the same, in Playwright's watch UI
+```
+
+Unit tests sit next to the pure modules they cover in `src/lib`. The standings
+engine is additionally pinned by `test-vectors/` — a hand-authored set plus a
+fuzz-generated one, both shared byte-for-byte with the PHP engine and diffed in
+CI, so the two implementations cannot drift.
+
+The end-to-end suite drives a real browser against a real backend: no mocks, no
+stubbed fetches. It signs in as the demo organizer (each login clones the demo
+template into its own sandbox, so runs are isolated), then asserts the three
+things this app claims to do — a spectator edit reorders the table client-side
+without saving, an organizer result saves and the standings recompute from it,
+that same result cascades into the knockout seeding, and a what-if projection
+re-ranks a group while leaving the stored standings untouched.
+
+```bash
+# in ../gauntlet-api — seed and serve the API the specs run against
+php artisan migrate:fresh --seed
+PHP_CLI_SERVER_WORKERS=8 php artisan serve --no-reload
+
+# here
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000/api npm run build
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000/api npm run test:e2e
+```
+
+Playwright boots `next start` itself on port 3100; set `E2E_BASE_URL` to point
+the specs at an already-running instance instead.
 
 ## Tooling
 

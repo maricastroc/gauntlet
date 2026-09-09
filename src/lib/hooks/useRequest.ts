@@ -6,15 +6,20 @@ import type { ApiError } from "@/lib/api/client";
 
 export type GetRequest = AxiosRequestConfig | null;
 
-interface Return<Data>
-  extends Pick<SWRResponse<AxiosResponse, ApiError>, "isValidating" | "isLoading" | "mutate"> {
+interface Return<Data> extends Pick<
+  SWRResponse<AxiosResponse, ApiError>,
+  "isValidating" | "isLoading" | "mutate"
+> {
   data: Data | undefined;
   meta: Record<string, unknown> | undefined;
   response: AxiosResponse | undefined;
   error: ApiError | undefined;
 }
 
-export interface Config<Data> extends Omit<SWRConfiguration<AxiosResponse, ApiError>, "fallbackData"> {
+export interface Config<Data> extends Omit<
+  SWRConfiguration<AxiosResponse, ApiError>,
+  "fallbackData"
+> {
   fallbackData?: Data;
 }
 

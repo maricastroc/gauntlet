@@ -1,11 +1,6 @@
 import { shortRound } from "@/lib/format";
 import type { FixtureDetail, PhasePill, TieTopology } from "@/lib/types";
 
-/**
- * Knockout phase pills, with each round's lock state derived from actual results:
- * a round is "done" once all its ties are finished, the first unfinished round is
- * "now", and everything after it stays "todo" (locked).
- */
 export function knockoutPhases(ties: TieTopology[], fixtures: FixtureDetail[]): PhasePill[] {
   if (!ties.length) return [];
 

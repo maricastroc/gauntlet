@@ -27,6 +27,7 @@ import {
 import type { GroupDetail } from "@/lib/types";
 import { buildTiebreakNote } from "./shared";
 import { liveBracket, liveConsoleGroups, liveGroups, liveMeta, liveOverview } from "./live";
+import { markLiveDegraded } from "./health";
 
 const LIVE_ENABLED = process.env.NEXT_PUBLIC_USE_LIVE_API !== "false";
 const DEMO_TOURNAMENT_ID = 1;
@@ -36,6 +37,7 @@ async function withFallback<T>(live: () => Promise<T>, demo: () => T, label: str
   try {
     return await live();
   } catch (error) {
+    markLiveDegraded(label);
     console.warn(
       `[data] live "${label}" failed, using fallback:`,
       error instanceof Error ? error.message : error,
@@ -194,20 +196,18 @@ function demoConsoleGroups(): GroupDetail[] {
     name: group.name,
     qualifyCount: group.qualifyCount,
     teams: group.teamIds.map(team),
-    fixtures: group.matches.map(
-      (match, index): FixtureDetail => ({
-        id: group.id * 100 + index,
-        tieId: null,
-        home: team(match.homeId),
-        away: team(match.awayId),
-        homeScore: match.homeScore,
-        awayScore: match.awayScore,
-        homePenalties: null,
-        awayPenalties: null,
-        status: "finished",
-        version: 0,
-      }),
-    ),
+    fixtures: group.matches.map((match, index): FixtureDetail => ({
+      id: group.id * 100 + index,
+      tieId: null,
+      home: team(match.homeId),
+      away: team(match.awayId),
+      homeScore: match.homeScore,
+      awayScore: match.awayScore,
+      homePenalties: null,
+      awayPenalties: null,
+      status: "finished",
+      version: 0,
+    })),
   }));
 }
 

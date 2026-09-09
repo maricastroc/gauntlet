@@ -150,9 +150,7 @@ export interface AuthUser {
 interface AuthResponse {
   user: AuthUser;
   token: string;
-  /** Present only for the demo account: the freshly cloned sandbox to switch to. */
   sandbox_tournament_id?: number;
-  /** Present when a new account opted into a starter sample tournament (owned, permanent). */
   sample_tournament_id?: number;
 }
 
@@ -181,7 +179,6 @@ export class ApiError extends Error {
     return (this.body as { errors?: Record<string, string[]> }).errors;
   }
 
-  /** Machine-readable denial reason on a 403 (e.g. "demo_expired", "not_owner"). */
   get reason(): string | undefined {
     if (typeof this.body !== "object" || this.body === null) return undefined;
     const reason = (this.body as { reason?: unknown }).reason;
@@ -373,7 +370,6 @@ export const api = {
   logout: (token: string) =>
     request<void>("/logout", { method: "POST", headers: authHeader(token) }),
 
-  /** Drops this session's demo sandbox and clones a fresh one. Returns its id. */
   resetDemo: async (token: string): Promise<number> => {
     const { sandbox_tournament_id } = await request<{ sandbox_tournament_id: number }>(
       "/demo/reset",
@@ -465,7 +461,6 @@ export const api = {
     return toTournamentDetail(data);
   }),
 
-  /** The public demo tournament id (the read-only template), resolved live — never hard-coded. */
   demoTemplateId: cache(async (): Promise<number | null> => {
     try {
       const { tournament_id } = await request<{ tournament_id: number | null }>("/demo/template");
@@ -475,11 +470,6 @@ export const api = {
     }
   }),
 
-  /**
-   * The tournament detail fetched WITH the caller's token, so `canManage` reflects the
-   * backend policy (owner, template read-only, …). Deliberately not `cache()`-wrapped:
-   * the manage screen needs the authoritative, token-scoped answer every time.
-   */
   getManagedTournament: async (token: string, id: number): Promise<TournamentDetail> => {
     const { data } = await request<Wrapped<ApiTournamentDetail>>(`/tournaments/${id}`, {
       headers: authHeader(token),

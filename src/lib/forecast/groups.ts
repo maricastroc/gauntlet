@@ -14,7 +14,6 @@ export interface GroupSim {
   played: RawMatch[];
   remaining: Array<[number, number]>;
   qualifyCount: number;
-  /** Optional scoring calibration; when omitted it is fit from this group's played matches. */
   calibration?: Calibration;
 }
 

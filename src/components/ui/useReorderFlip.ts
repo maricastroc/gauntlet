@@ -5,15 +5,6 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-/**
- * FLIP reorder: as keyed rows change order, each element glides from its previous
- * position to its new one instead of jumping. Uses the Web Animations API — which the
- * global reduced-motion CSS override does not touch — so it checks the media query
- * itself and skips the tween when the user prefers reduced motion.
- *
- * Pass an `orderKey` that changes whenever the order might change; attach the returned
- * `register(key)` as a row's `ref`.
- */
 export function useReorderFlip(orderKey: string) {
   const nodes = useRef(new Map<number | string, HTMLElement>());
   const callbacks = useRef(new Map<number | string, (el: HTMLElement | null) => void>());

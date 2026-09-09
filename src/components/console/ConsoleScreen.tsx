@@ -17,11 +17,6 @@ type Section =
   | { kind: "group"; key: string; label: string; group: GroupDetail; locked: false }
   | { kind: "round"; key: string; label: string; ties: BracketTie[]; locked: boolean };
 
-/**
- * Knockout rounds as selectable sections, locked to match the header: a round is
- * open once every earlier round is decided, and stays locked until then — so the
- * Console can never record a result for a round the tournament hasn't reached.
- */
 function knockoutSections(bracket: Bracket): Section[] {
   if (!bracket.ties.length) return [];
   const maxRound = Math.max(...bracket.ties.map((tie) => tie.round), 1);
@@ -46,7 +41,13 @@ function knockoutSections(bracket: Bracket): Section[] {
       } else {
         locked = true;
       }
-      return { kind: "round" as const, key: `r${round}`, label: shortRound(round, maxRound), ties, locked };
+      return {
+        kind: "round" as const,
+        key: `r${round}`,
+        label: shortRound(round, maxRound),
+        ties,
+        locked,
+      };
     });
 }
 

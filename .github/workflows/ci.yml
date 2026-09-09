@@ -23,6 +23,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Prettier
+        run: npm run format:check
+
       - name: ESLint
         run: npm run lint
 
@@ -48,9 +51,105 @@ jobs:
       - name: Checkout api (sibling engine)
         uses: actions/checkout@v4
         with:
-          repository: maricastroc/tournament-game-api
+          repository: maricastroc/gauntlet-api
           path: api
           token: ${{ secrets.CONFORMANCE_REPO_TOKEN || github.token }}
 
       - name: Assert both engines share identical conformance vectors
         run: web/scripts/check-vectors-parity.sh web/test-vectors api/tests/Vectors
+
+  e2e:
+    name: End-to-end — web against the real API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout web (this repo)
+        uses: actions/checkout@v4
+        with:
+          path: web
+
+      - name: Checkout api (sibling engine)
+        uses: actions/checkout@v4
+        with:
+          repository: maricastroc/gauntlet-api
+          path: api
+          token: ${{ secrets.CONFORMANCE_REPO_TOKEN || github.token }}
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: mbstring, pdo, sqlite3, pdo_sqlite, bcmath, intl
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: api/vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('api/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install API dependencies
+        working-directory: api
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Seed the API
+        working-directory: api
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          touch database/database.sqlite
+          php artisan migrate:fresh --seed --force
+
+      - name: Serve the API
+        working-directory: api
+        env:
+          PHP_CLI_SERVER_WORKERS: "10"
+          SSE_MAX_SECONDS: "10"
+          SSE_POLL_MS: "800"
+        run: |
+          php artisan serve --host=127.0.0.1 --port=8000 --no-reload > /tmp/api.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8000/up > /dev/null && exit 0
+            sleep 1
+          done
+          echo "API did not come up"
+          cat /tmp/api.log
+          exit 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Install Playwright browser
+        working-directory: web
+        run: npx playwright install --with-deps chromium
+
+      - name: Build the web app against the live API
+        working-directory: web
+        env:
+          NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8000/api
+        run: npm run build
+
+      - name: Playwright
+        working-directory: web
+        env:
+          NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8000/api
+        run: npm run test:e2e
+
+      - name: API log
+        if: failure()
+        run: cat /tmp/api.log
+
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: web/playwright-report
+          retention-days: 7

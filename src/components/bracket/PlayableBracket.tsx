@@ -30,7 +30,6 @@ export function PlayableBracket({
 }: {
   initial: BracketData;
   tournamentId: number;
-  /** Force a pure read-only render (the public /live view) regardless of who is watching. */
   spectator?: boolean;
 }) {
   const { status, token } = useAuth();

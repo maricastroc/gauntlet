@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GroupDetail, StandingRow } from "@/lib/types";
 import { computeStandings, type RawMatch } from "@/lib/standings";
 import { api } from "@/lib/api/client";
@@ -23,11 +23,7 @@ const SAVE_DELAY = 700;
 
 type RowMap = Record<number, RowState>;
 
-function rawMatches(
-  fixtures: GroupDetail["fixtures"],
-  rows: RowMap,
-  live: boolean,
-): RawMatch[] {
+function rawMatches(fixtures: GroupDetail["fixtures"], rows: RowMap, live: boolean): RawMatch[] {
   return fixtures.flatMap((fixture) => {
     if (!fixture.home || !fixture.away) return [];
     const row = rows[fixture.id];
@@ -113,39 +109,59 @@ export function useGroupEditor(group: GroupDetail) {
     .map((row: StandingRow) => `${row.team.id}:${row.points}:${row.goalDifference}`)
     .join("|");
 
-  async function save(id: number) {
-    if (!authed || !token) return;
-    const row = rowsRef.current[id];
-    if (!row) return;
-    setRows((prev) => ({ ...prev, [id]: { ...prev[id], status: "saving" } }));
-    try {
-      await api.submitGroupResult(token, id, {
-        home_score: row.home,
-        away_score: row.away,
-        expected_version: row.version,
-      });
-      if (!mounted.current) return;
-      setRows((prev) => {
-        const current = prev[id];
-        return {
-          ...prev,
-          [id]: {
-            ...current,
-            version: current.version + 1,
-            status: "saved",
-            savedHome: current.home,
-            savedAway: current.away,
-            finished: true,
-          },
-        };
-      });
-      setSavedNonce((n) => n + 1);
-    } catch (err) {
-      notifyApiError(err);
-      if (!mounted.current) return;
-      setRows((prev) => ({ ...prev, [id]: { ...prev[id], status: "error" } }));
+  const save = useCallback(
+    async function save(id: number) {
+      if (!authed || !token) return;
+      const row = rowsRef.current[id];
+      if (!row) return;
+      setRows((prev) => ({ ...prev, [id]: { ...prev[id], status: "saving" } }));
+      try {
+        await api.submitGroupResult(token, id, {
+          home_score: row.home,
+          away_score: row.away,
+          expected_version: row.version,
+        });
+        if (!mounted.current) return;
+        setRows((prev) => {
+          const current = prev[id];
+          return {
+            ...prev,
+            [id]: {
+              ...current,
+              version: current.version + 1,
+              status: "saved",
+              savedHome: current.home,
+              savedAway: current.away,
+              finished: true,
+            },
+          };
+        });
+        setSavedNonce((n) => n + 1);
+      } catch (err) {
+        notifyApiError(err);
+        if (!mounted.current) return;
+        setRows((prev) => ({ ...prev, [id]: { ...prev[id], status: "error" } }));
+      }
+    },
+    [authed, token],
+  );
+
+  const scheduleSave = useCallback(
+    (id: number) => {
+      if (timers.current[id]) clearTimeout(timers.current[id]);
+      timers.current[id] = setTimeout(() => save(id), SAVE_DELAY);
+    },
+    [save],
+  );
+
+  useEffect(() => {
+    if (!authed) return;
+    for (const [id, row] of Object.entries(rowsRef.current)) {
+      if (row.home !== row.savedHome || row.away !== row.savedAway) {
+        scheduleSave(Number(id));
+      }
     }
-  }
+  }, [authed, scheduleSave]);
 
   function setScore(id: number, side: "home" | "away", value: number) {
     const next = Math.max(0, Math.min(99, value));
@@ -158,8 +174,7 @@ export function useGroupEditor(group: GroupDetail) {
     });
 
     if (!authed) return;
-    if (timers.current[id]) clearTimeout(timers.current[id]);
-    timers.current[id] = setTimeout(() => save(id), SAVE_DELAY);
+    scheduleSave(id);
   }
 
   return {
